@@ -1,12 +1,25 @@
 package org.example.logic.model;
 
+import jakarta.persistence.*;
+
+@Entity
 public class BankAccount
 {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id = 0;
-	private final String accountHolder;
+
+    @Column(unique = true)
+	private String accountHolder;
+
 	private double balance;
 
-	public double getBalance( )
+    public BankAccount()
+    {
+
+    }
+
+    public double getBalance( )
 	{
 		return balance;
 	}
