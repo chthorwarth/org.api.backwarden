@@ -8,7 +8,7 @@ import org.example.logic.services.CredentialService;
 
 public class Main
 {
-	static void main( )
+	public static void main(String[] args)
 	{
 		CredentialRepository repository = new CredentialAdapter();
 		CredentialAPI api = new CredentialService(repository);
