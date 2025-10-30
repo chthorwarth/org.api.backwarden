@@ -1,0 +1,37 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+# Build output
+target/
+build/
+
+# Logs
+*.log
+
+# OS-spezifische Dateien
+.DS_Store
+Thumbs.db
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle Wrapper
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Dependency caches
+**/node_modules/
+**/.classpath
+**/.project
+**/.settings/
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# Compiled classes
+*.class
