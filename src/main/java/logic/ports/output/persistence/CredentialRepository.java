@@ -1,6 +1,4 @@
-package org.example.logic.ports.output.persistence;
-
-import org.example.logic.model.BankAccount;
+package logic.ports.output.persistence;
 
 public interface CredentialRepository
 {

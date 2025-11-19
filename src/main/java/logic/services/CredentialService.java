@@ -1,7 +1,7 @@
-package org.example.logic.services;
+package logic.services;
 
-import org.example.logic.ports.input.CredentialAPI;
-import org.example.logic.ports.output.persistence.CredentialRepository;
+import logic.ports.input.CredentialAPI;
+import logic.ports.output.persistence.CredentialRepository;
 
 public class CredentialService implements CredentialAPI
 {

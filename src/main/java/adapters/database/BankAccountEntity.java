@@ -1,4 +1,4 @@
-package org.example.adapters.database;
+package adapters.database;
 
 public class BankAccountEntity
 {

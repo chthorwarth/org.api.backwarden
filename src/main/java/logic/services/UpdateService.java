@@ -1,4 +1,4 @@
-package org.example.logic.services;
+package logic.services;
 
 public class UpdateService
 {

@@ -1,6 +1,7 @@
-package org.example.adapters.api;
+package adapters.api;
 
-import org.example.logic.ports.input.CredentialAPI;
+
+import logic.ports.input.CredentialAPI;
 
 public class CredentialController
 {

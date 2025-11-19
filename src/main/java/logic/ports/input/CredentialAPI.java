@@ -1,4 +1,4 @@
-package org.example.logic.ports.input;
+package logic.ports.input;
 
 public interface CredentialAPI
 {

@@ -1,7 +1,8 @@
-package org.example.adapters.database;
+package adapters.database;
 
-import org.example.logic.model.BankAccount;
-import org.example.logic.ports.output.persistence.CredentialRepository;
+
+import logic.model.BankAccount;
+import logic.ports.output.persistence.CredentialRepository;
 
 import java.util.ArrayList;
 
@@ -11,7 +12,7 @@ public class CredentialAdapter implements CredentialRepository
 	private final ArrayList<BankAccountEntity> accounts = new ArrayList<>( );
 
 	@Override
-	public BankAccount findAccountById( long id )
+	public BankAccount findAccountById(long id )
 	{
 		BankAccountEntity entity = accounts.stream( )
 										   .filter( account -> account.getId( ) == id )

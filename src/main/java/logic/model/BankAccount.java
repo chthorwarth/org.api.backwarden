@@ -1,4 +1,4 @@
-package org.example.logic.model;
+package logic.model;
 
 import jakarta.persistence.*;
 
