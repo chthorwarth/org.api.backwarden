@@ -11,7 +11,7 @@ public class CredentialAdapter implements CredentialRepository
 	/* TODO better use a map here */
 	private final ArrayList<BankAccountEntity> accounts = new ArrayList<>( );
 
-	@Override
+	/*@Override
 	public BankAccount findAccountById(long id )
 	{
 		BankAccountEntity entity = accounts.stream( )
@@ -19,7 +19,7 @@ public class CredentialAdapter implements CredentialRepository
 										   .findFirst( )
 										   .orElse( null );
 		return mapToAccount( entity );
-	}
+	}*/
 
 	@Override
 	public void createAccount( long accountNumber, String accountHolder, double balance )
@@ -27,7 +27,7 @@ public class CredentialAdapter implements CredentialRepository
 		accounts.add( new BankAccountEntity( accountNumber, accountHolder, balance ) );
 	}
 
-	@Override
+	/*@Override
 	public boolean updateAccount( long id, BankAccount newAccount )
 	{
 		BankAccount oldAccount = findAccountById( id );
@@ -37,7 +37,7 @@ public class CredentialAdapter implements CredentialRepository
 
 		accounts.set( ( int ) oldAccount.getId( ), mapToEntity( newAccount ) );
 		return true;
-	}
+	}*/
 
 	private BankAccountEntity mapToEntity( BankAccount account )
 	{

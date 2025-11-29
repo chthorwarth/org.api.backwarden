@@ -1,5 +1,4 @@
 
-import adapters.api.CredentialController;
 import adapters.database.CredentialAdapter;
 import logic.ports.input.CredentialAPI;
 import logic.ports.output.persistence.CredentialRepository;
@@ -11,6 +10,6 @@ public class Main
 	{
 		CredentialRepository repository = new CredentialAdapter();
 		CredentialAPI api = new CredentialService(repository);
-		CredentialController controller = new CredentialController(api);
+		//CredentialController controller = new CredentialController(api);
 	}
 }
