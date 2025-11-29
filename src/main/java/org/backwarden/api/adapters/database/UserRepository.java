@@ -4,18 +4,19 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.backwarden.api.adapters.database.model.UserEntity;
 
 @ApplicationScoped
 
-public class CredentialRepository {
+public class UserRepository {
     @Inject
     EntityManager entityManager;
 
     @Transactional // Wichtig für Schreiboperationen
-    public void saveCredential(CredentialEntity credential) {
-        entityManager.persist(credential);
+    public void saveUser(UserEntity user) {
+        entityManager.persist(user);
     }
-    public CredentialEntity getCredential(long id) {
-        return entityManager.find(CredentialEntity.class, id);
+    public UserEntity getUser(long id) {
+        return entityManager.find(UserEntity.class, id);
     }
 }

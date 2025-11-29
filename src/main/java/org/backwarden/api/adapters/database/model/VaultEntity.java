@@ -1,12 +1,18 @@
 package org.backwarden.api.adapters.database.model;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.List;
 
+@Entity
 public class VaultEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
-    private UserEntity user;
-    private List<CredentialEntity> credentials;
+    //private UserEntity user;
+    //private List<CredentialEntity> credentials;
     private boolean autoFill;
 
     public long getId() {
@@ -25,21 +31,21 @@ public class VaultEntity {
         this.title = title;
     }
 
-    public UserEntity getUser() {
-        return user;
-    }
+//    public UserEntity getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(UserEntity user) {
+//        this.user = user;
+//    }
 
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
-
-    public List<CredentialEntity> getCredentials() {
-        return credentials;
-    }
-
-    public void setCredentials(List<CredentialEntity> credentials) {
-        this.credentials = credentials;
-    }
+//    public List<CredentialEntity> getCredentials() {
+//        return credentials;
+//    }
+//
+//    public void setCredentials(List<CredentialEntity> credentials) {
+//        this.credentials = credentials;
+//    }
 
     public boolean isAutoFill() {
         return autoFill;

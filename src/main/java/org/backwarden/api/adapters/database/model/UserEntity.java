@@ -2,9 +2,15 @@ package org.backwarden.api.adapters.database.model;
 
 import java.time.Instant;
 import java.util.List;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
-
+@Entity
 public class UserEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String masterEmail;
     private String masterPassword;
@@ -12,7 +18,7 @@ public class UserEntity {
     private String masterPasswordSalt;
     private int failedLoginAttempts;
     private Instant lockedUntil;
-    private List<VaultEntity> vaults;
+    //private List<VaultEntity> vaults;
 
     public long getId() {
         return id;
@@ -70,11 +76,11 @@ public class UserEntity {
         this.lockedUntil = lockedUntil;
     }
 
-    public List<VaultEntity> getVaults() {
-        return vaults;
-    }
-
-    public void setVaults(List<VaultEntity> vaults) {
-        this.vaults = vaults;
-    }
+//    public List<VaultEntity> getVaults() {
+//        return vaults;
+//    }
+//
+//    public void setVaults(List<VaultEntity> vaults) {
+//        this.vaults = vaults;
+//    }
 }

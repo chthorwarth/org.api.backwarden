@@ -7,8 +7,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import org.backwarden.api.logic.model.Credential;
 
-@Path("/hello")
+@Path("/credential")
 @ApplicationScoped
 public class CredentialController
 {
@@ -30,8 +31,13 @@ public class CredentialController
 	public String hello() {
         System.out.println("Hello World");
         CredentialEntity credential = new CredentialEntity();
+        credential.setPassword("password");
         credentialRepository.saveCredential(credential);
-		return "Hello";
+
+        CredentialEntity credentialNew = credentialRepository.getCredential(1);
+        System.out.println(credentialNew.getPassword());
+		return credentialNew.getPassword();
+
 	}
 
 }
