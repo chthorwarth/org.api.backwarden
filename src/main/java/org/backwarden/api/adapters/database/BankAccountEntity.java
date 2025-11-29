@@ -1,4 +1,4 @@
-package adapters.database;
+package org.backwarden.api.adapters.database;
 
 public class BankAccountEntity
 {

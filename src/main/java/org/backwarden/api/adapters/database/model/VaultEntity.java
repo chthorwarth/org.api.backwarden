@@ -1,4 +1,4 @@
-package adapters.database.model;
+package org.backwarden.api.adapters.database.model;
 
 import java.util.List;
 

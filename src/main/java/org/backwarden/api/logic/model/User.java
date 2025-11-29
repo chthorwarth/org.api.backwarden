@@ -1,4 +1,4 @@
-package logic.model;
+package org.backwarden.api.logic.model;
 
 import java.time.Instant;
 import java.util.List;

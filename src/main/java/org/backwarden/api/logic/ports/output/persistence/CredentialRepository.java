@@ -1,4 +1,4 @@
-package logic.ports.output.persistence;
+package org.backwarden.api.logic.ports.output.persistence;
 
 public interface CredentialRepository
 {

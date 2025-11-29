@@ -1,7 +1,10 @@
-package adapters.controller;
+package org.backwarden.api.adapters.controller;
 
 
+import org.backwarden.api.adapters.database.CredentialRepository;
+import org.backwarden.api.adapters.database.model.CredentialEntity;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 
@@ -9,6 +12,9 @@ import jakarta.ws.rs.Path;
 @ApplicationScoped
 public class CredentialController
 {
+
+    @Inject
+    CredentialRepository credentialRepository;
 
 	/*private final CredentialAPI credentialService;
 
@@ -22,6 +28,12 @@ public class CredentialController
 
 	@GET
 	public String hello() {
+        System.out.println("Hello World");
+        CredentialEntity credential = new CredentialEntity();
+        credentialRepository.saveCredential(credential);
 		return "Hello";
 	}
+
 }
+
+

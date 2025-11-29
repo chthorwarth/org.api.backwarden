@@ -1,17 +1,8 @@
-package adapters.database.model;
+package org.backwarden.api.logic.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-@Entity
-
-public class CredentialEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Credential {
     private long id;
-    private VaultEntity vault;
+    private Vault vault;
     private String title;
     private boolean isPasswordSecure;
     private String username;
@@ -28,11 +19,11 @@ public class CredentialEntity {
         this.id = id;
     }
 
-    public VaultEntity getVault() {
+    public Vault getVault() {
         return vault;
     }
 
-    public void setVault(VaultEntity vault) {
+    public void setVault(Vault vault) {
         this.vault = vault;
     }
 
