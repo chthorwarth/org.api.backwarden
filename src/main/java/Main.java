@@ -8,6 +8,7 @@ public class Main
 {
 	public static void main(String[] args)
 	{
+//Test
 		CredentialRepository repository = new CredentialAdapter();
 		CredentialAPI api = new CredentialService(repository);
 		//CredentialController controller = new CredentialController(api);
