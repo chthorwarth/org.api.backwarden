@@ -36,5 +36,108 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.16</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-jackson</artifactId>
+            <version>3.12.3</version>
+        </dependency>
+
+        <!-- Quarkus CDI (dependency injection) support -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-arc</artifactId>
+            <version>3.12.3</version>
+        </dependency>
+
+        <!-- JUnit 5 integration for Quarkus tests -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <version>3.12.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Apache Commons Lang: useful utility classes -->
+        <!--
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.16.0</version>
+        </dependency>
+        -->
+
+        <!-- Apache Commons Collections: extended collection implementations -->
+        <!--
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+        </dependency>
+        -->
+
+        <!-- REST Assured: testing REST endpoints -->
+        <!--
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>5.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+
+        <!-- ModelMapper: automatic object/DTO mapping -->
+        <!--
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        -->
+
+        <!-- JavaFaker: generating fake test data -->
+        <!--
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        -->
+
+        <!-- Hibernate ORM with JPA support -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-orm</artifactId>
+            <version>3.12.3</version>
+        </dependency>
+
+        <!-- H2 JDBC driver integration for Quarkus -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-h2</artifactId>
+            <version>3.12.3</version>
+        </dependency>
+
+        <!-- H2 Database engine (optional if not used directly) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.220</version>
+        </dependency>
+
+        <!-- Bean Validation (e.g. @NotNull, @Valid) -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
+            <version>3.12.3</version>
+        </dependency>
+
+        <!-- RESTEasy JAXB support for XML (only needed if using XML) -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-jaxb</artifactId>
+            <version>3.12.3</version>
+        </dependency>
     </dependencies>
 </project>
