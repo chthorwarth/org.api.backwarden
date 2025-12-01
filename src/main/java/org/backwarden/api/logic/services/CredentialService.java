@@ -1,7 +1,7 @@
-package logic.services;
+package org.backwarden.api.logic.services;
 
-import logic.ports.input.CredentialAPI;
-import logic.ports.output.persistence.CredentialRepository;
+import org.backwarden.api.logic.ports.input.CredentialAPI;
+import org.backwarden.api.logic.ports.output.persistence.CredentialRepository;
 
 public class CredentialService implements CredentialAPI
 {
@@ -10,6 +10,7 @@ public class CredentialService implements CredentialAPI
 	public CredentialService(CredentialRepository credentialRepository) {
 		this.credentialRepository = credentialRepository;
 	}
+    // hello
 
 	@Override
 	public void createCredentials(String username, String password) {
