@@ -17,6 +17,6 @@ public class UserRepository {
         entityManager.persist(user);
     }
     public UserEntity getUser(long id) {
-        return entityManager.find(UserEntity.class, id);
+        return entityManager.find(UserEntity.class, id);    // Muss hier schon in User gemappt werden?
     }
 }

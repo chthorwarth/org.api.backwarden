@@ -7,7 +7,9 @@ public class CredentialEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    //private VaultEntity vault;
+    @OneToOne
+    @JoinColumn(name = "vault_id")
+    private VaultEntity vault;
     private String title;
     private boolean isPasswordSecure;
     private String username;
@@ -24,13 +26,13 @@ public class CredentialEntity {
         this.id = id;
     }
 
-//    public VaultEntity getVault() {
-//        return vault;
-//    }
-//
-//    public void setVault(VaultEntity vault) {
-//        this.vault = vault;
-//    }
+    public VaultEntity getVault() {
+        return vault;
+    }
+
+    public void setVault(VaultEntity vault) {
+        this.vault = vault;
+    }
 
     public String getTitle() {
         return title;
