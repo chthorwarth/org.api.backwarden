@@ -31,12 +31,12 @@ public class CredentialController
 	public String hello() {
         System.out.println("Hello World");
         CredentialEntity credential = new CredentialEntity();
-        credential.setPassword("password");
+        credential.setPasswordCiphertext("password");
         credentialRepository.saveCredential(credential);
 
         CredentialEntity credentialNew = credentialRepository.getCredential(1);
-        System.out.println(credentialNew.getPassword());
-		return credentialNew.getPassword();
+        System.out.println(credentialNew.getPasswordCiphertext());
+		return credentialNew.getPasswordCiphertext();
 
 	}
 

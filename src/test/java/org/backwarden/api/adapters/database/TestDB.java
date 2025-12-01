@@ -20,6 +20,14 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+/** TODO
+ * following tests are missing:
+ * - cascade is working as expected
+ * - orphan removal is working as expected
+ * - is bidirectionality working
+ * - lazy loading is working as expected
+ */
 @QuarkusTest
 public class TestDB
 
@@ -43,17 +51,13 @@ public class TestDB
         vault.setAutoFill(true);
 
 
-        List<VaultEntity> vaults = new ArrayList<VaultEntity>();
-        vaults.add(vault);
-
-
         user.setMasterEmail("simon@thws");
-        user.setMasterPassword("Password");
+        user.setMasterPasswordHash("Password");
         user.setMasterPasswordHash("PasswordHash");
         user.setMasterPasswordSalt("PasswordSalt");
         user.setFailedLoginAttempts(1);
         user.setLockedUntil(null);
-        user.setVaults(vaults);
+        user.addVault(vault);
 
         vault.setUser(user);
 
@@ -61,9 +65,7 @@ public class TestDB
 
         cred.setVault(vault);
         cred.setTitle("Credential");
-        cred.setPasswordSecure(true);
         cred.setUsername("Username");
-        cred.setPassword("Password");
         cred.setPasswordCiphertext("PasswordCiphertext");
         cred.setPasswordIV("PasswordIV");
         cred.setNote("Note");
