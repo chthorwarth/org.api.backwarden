@@ -1,4 +1,4 @@
-package logic.ports.input;
+package org.backwarden.api.logic.ports.input;
 
 public interface CredentialAPI
 {

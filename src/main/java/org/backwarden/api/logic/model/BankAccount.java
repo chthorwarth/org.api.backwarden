@@ -1,4 +1,4 @@
-package logic.model;
+package org.backwarden.api.logic.model;
 
 import jakarta.persistence.*;
 

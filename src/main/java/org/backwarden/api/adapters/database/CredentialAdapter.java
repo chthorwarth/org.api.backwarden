@@ -1,8 +1,8 @@
-package adapters.database;
+package org.backwarden.api.adapters.database;
 
 
-import logic.model.BankAccount;
-import logic.ports.output.persistence.CredentialRepository;
+import org.backwarden.api.logic.model.BankAccount;
+import org.backwarden.api.logic.ports.output.persistence.CredentialRepository;
 
 import java.util.ArrayList;
 

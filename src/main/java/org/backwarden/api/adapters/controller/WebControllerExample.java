@@ -1,4 +1,4 @@
-//package adapters.api;
+//package org.backwarden.api.adapters.api;
 //
 //import io.netty.handler.codec.http.HttpResponseStatus;
 //import jakarta.inject.Inject;
