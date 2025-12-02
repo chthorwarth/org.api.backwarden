@@ -1,21 +1,21 @@
 package org.backwarden.api.adapters.database;
-import org.backwarden.api.adapters.database.model.CredentialEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.backwarden.api.adapters.database.model.VaultEntity;
 
 @ApplicationScoped
 
-public class CredentialRepository {
+public class VaultAdapter {
     @Inject
     EntityManager entityManager;
 
     @Transactional // Wichtig für Schreiboperationen
-    public void saveCredential(CredentialEntity credential) {
-        entityManager.persist(credential);
+    public void saveVault(VaultEntity vault) {
+        entityManager.persist(vault);
     }
-    public CredentialEntity getCredential(long id) {
-        return entityManager.find(CredentialEntity.class, id);
+    public VaultEntity getVault(long id) {
+        return entityManager.find(VaultEntity.class, id);
     }
 }

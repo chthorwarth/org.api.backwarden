@@ -4,16 +4,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import org.backwarden.api.adapters.database.CredentialRepository;
-import org.backwarden.api.adapters.database.VaultRepository;
-import org.backwarden.api.adapters.database.model.CredentialEntity;
+import org.backwarden.api.adapters.database.VaultAdapter;
 import org.backwarden.api.adapters.database.model.VaultEntity;
 
 @Path("/vault")
 @ApplicationScoped
 public class VaultController {
     @Inject
-    VaultRepository vaultRepository;
+    VaultAdapter vaultAdapter;
 
 	/*private final CredentialAPI credentialService;
 
@@ -30,9 +28,9 @@ public class VaultController {
         System.out.println("Hello World");
         VaultEntity vault = new VaultEntity();
         vault.setTitle("Simon");
-        vaultRepository.saveVault(vault);
+        vaultAdapter.saveVault(vault);
 
-        VaultEntity vaultNew = vaultRepository.getVault(1);
+        VaultEntity vaultNew = vaultAdapter.getVault(1);
         System.out.println(vaultNew.getTitle());
         return vaultNew.getTitle();
 

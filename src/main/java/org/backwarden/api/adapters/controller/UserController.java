@@ -4,16 +4,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import org.backwarden.api.adapters.database.CredentialRepository;
-import org.backwarden.api.adapters.database.UserRepository;
-import org.backwarden.api.adapters.database.model.CredentialEntity;
+import org.backwarden.api.adapters.database.UserAdapter;
 import org.backwarden.api.adapters.database.model.UserEntity;
 
 @Path("/user")
 @ApplicationScoped
 public class UserController {
     @Inject
-    UserRepository userRepository;
+    UserAdapter userAdapter;
 
 	/*private final CredentialAPI credentialService;
 
@@ -30,9 +28,9 @@ public class UserController {
         System.out.println("Hello World");
         UserEntity user = new UserEntity();
         user.setMasterEmail("simon@thws");
-        userRepository.saveUser(user);
+        userAdapter.saveUser(user);
 
-        UserEntity userNew = userRepository.getUser(1);
+        UserEntity userNew = userAdapter.getUser(1);
         System.out.println(userNew.getMasterEmail());
         return userNew.getMasterEmail();
 

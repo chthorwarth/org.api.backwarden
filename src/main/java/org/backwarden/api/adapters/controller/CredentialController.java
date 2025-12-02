@@ -1,44 +1,36 @@
 package org.backwarden.api.adapters.controller;
 
 
-import org.backwarden.api.adapters.database.CredentialRepository;
-import org.backwarden.api.adapters.database.model.CredentialEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import org.backwarden.api.adapters.controller.model.CredentialDTO;
 import org.backwarden.api.logic.model.Credential;
+import org.backwarden.api.logic.ports.input.CredentialAPI;
+import org.backwarden.api.logic.services.CredentialService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/credential")
 @ApplicationScoped
 public class CredentialController
 {
 
-    @Inject
-    CredentialRepository credentialRepository;
-
-	/*private final CredentialAPI credentialService;
-
-	public CredentialController(CredentialAPI credentialService) {
-		this.credentialService = credentialService;
-	}
-
-	public void createCredentials(String username, String password) {
-		credentialService.createCredentials(username, password);
-	}*/
+    CredentialAPI credentialAPI;
 
 	@GET
-	public String hello() {
-        System.out.println("Hello World");
-        CredentialEntity credential = new CredentialEntity();
-        credential.setPasswordCiphertext("password");
-        credentialRepository.saveCredential(credential);
-
-        CredentialEntity credentialNew = credentialRepository.getCredential(1);
-        System.out.println(credentialNew.getPasswordCiphertext());
-		return credentialNew.getPasswordCiphertext();
-
+	public List<CredentialDTO> getCredentials() {
+        credentialAPI.getCredential(5);
+        return new ArrayList<CredentialDTO>();
 	}
+
+    @POST
+    public void createCredentials() {
+        credentialAPI.createCredentials(new Credential());
+    }
 
 }
 

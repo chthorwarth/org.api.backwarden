@@ -1,6 +1,10 @@
 package org.backwarden.api.logic.ports.input;
 
+import org.backwarden.api.logic.model.Credential;
+
 public interface CredentialAPI
 {
-	void createCredentials(String username, String password);
+	public void createCredentials(Credential credential);
+
+	public Credential getCredential(int id);
 }
