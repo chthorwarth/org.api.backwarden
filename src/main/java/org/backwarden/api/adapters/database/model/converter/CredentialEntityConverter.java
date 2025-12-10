@@ -12,9 +12,11 @@ public class CredentialEntityConverter
         CredentialEntity credentialEntity = new CredentialEntity();
         credentialEntity.setId(credential.getId());
         credentialEntity.setUsername(credential.getUsername());
+        //credentialEntity.setPassword(credential.getPassword());
         credentialEntity.setNote(credential.getNote());
         credentialEntity.setTitle(credential.getTitle());
         credentialEntity.setPasswordCiphertext(credential.getPasswordCiphertext());
+        //credentialEntity.setPasswordSecure(credential.isPasswordSecure());
 
         credentialEntity.setVault(null); //mapping results in endless loop
         return credentialEntity;
@@ -26,9 +28,11 @@ public class CredentialEntityConverter
 
         credential.setId(credentialEntity.getId());
         credential.setUsername(credentialEntity.getUsername());
+        //credential.setPassword(credentialEntity.getPassword());
         credential.setNote(credentialEntity.getNote());
         credential.setTitle(credentialEntity.getTitle());
         credential.setPasswordCiphertext(credentialEntity.getPasswordCiphertext());
+        //credential.setPasswordSecure(credentialEntity.isPasswordSecure());
 
         credential.setVault(null); //mapping results in endless loop
 

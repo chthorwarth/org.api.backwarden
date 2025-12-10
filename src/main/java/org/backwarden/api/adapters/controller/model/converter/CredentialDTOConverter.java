@@ -17,6 +17,7 @@ public class CredentialDTOConverter {
         credentialDTO.setUsername(credential.getUsername());
         credentialDTO.setPassword(credential.getPassword());
         credentialDTO.setPasswordCiphertext(credential.getPasswordCiphertext());
+        credentialDTO.setPasswordSecure(credential.isPasswordSecure());
         credentialDTO.setPasswordIV(credential.getPasswordIV());
         credentialDTO.setNote(credential.getNote());
         return credentialDTO;

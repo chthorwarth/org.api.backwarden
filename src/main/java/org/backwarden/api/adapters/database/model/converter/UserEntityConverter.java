@@ -10,9 +10,11 @@ public class UserEntityConverter
         UserEntity userEntity = new UserEntity();
 
         userEntity.setId(user.getId());
+        //userEntity.setVaults(VaultEntityConverter.toEntityList(user.getVaults()));
         userEntity.setFailedLoginAttempts(user.getFailedLoginAttempts());
         userEntity.setLockedUntil(user.getLockedUntil());
         userEntity.setMasterEmail(user.getMasterEmail());
+        //userEntity.setMasterPassword(user.getMasterPassword());
         userEntity.setMasterPasswordHash(user.getMasterPasswordHash());
         userEntity.setMasterPasswordSalt(user.getMasterPasswordSalt());
 
@@ -24,9 +26,11 @@ public class UserEntityConverter
         User user = new User();
 
         user.setId(userEntity.getId());
+        user.setVaults(VaultEntityConverter.fromEntityList(userEntity.getVaults()));
         user.setFailedLoginAttempts(userEntity.getFailedLoginAttempts());
         user.setLockedUntil(userEntity.getLockedUntil());
         user.setMasterEmail(userEntity.getMasterEmail());
+        //user.setMasterPassword(userEntity.getMasterPassword());
         user.setMasterPasswordHash(userEntity.getMasterPasswordHash());
         user.setMasterPasswordSalt(userEntity.getMasterPasswordSalt());
 

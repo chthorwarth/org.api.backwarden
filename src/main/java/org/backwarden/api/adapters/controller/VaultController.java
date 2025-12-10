@@ -9,7 +9,8 @@ import org.backwarden.api.adapters.database.model.VaultEntity;
 
 @Path("/vault")
 @ApplicationScoped
-public class VaultController {
+public class VaultController
+{
     @Inject
     VaultAdapter vaultAdapter;
 
@@ -24,15 +25,17 @@ public class VaultController {
 	}*/
 
     @GET
-    public String hello() {
+    public String hello()
+    {
         System.out.println("Hello World");
         VaultEntity vault = new VaultEntity();
         vault.setTitle("Simon");
         vaultAdapter.saveVault(vault);
 
-        VaultEntity vaultNew = vaultAdapter.getVault(1);
-        System.out.println(vaultNew.getTitle());
-        return vaultNew.getTitle();
+        //VaultEntity vaultNew = vaultAdapter.getVault(1);
+        //System.out.println(vaultNew.getTitle());
+
+        return "hello";
 
     }
 }
