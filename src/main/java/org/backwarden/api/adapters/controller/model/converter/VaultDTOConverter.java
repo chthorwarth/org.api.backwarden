@@ -10,7 +10,6 @@ public class VaultDTOConverter {
         VaultDTO vaultDTO = new VaultDTO();
         vaultDTO.setId(vault.getId());
         vaultDTO.setTitle(vault.getTitle());
-        vaultDTO.setUser(null);     //results in endless loop
         vaultDTO.setCredentials(CredentialDTOConverter.toDTOList(vault.getCredentials()));
         vaultDTO.setAutoFill(vault.isAutoFill());
         return vaultDTO;

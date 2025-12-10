@@ -8,7 +8,6 @@ import java.util.List;
 public class VaultDTO {
     private long id;
     private String title;
-    private UserDTO user;
     private List<CredentialDTO> credentials;
     private boolean autoFill;
 
@@ -26,14 +25,6 @@ public class VaultDTO {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public UserDTO getUser() {
-        return user;
-    }
-
-    public void setUser(UserDTO user) {
-        this.user = user;
     }
 
     public List<CredentialDTO> getCredentials() {

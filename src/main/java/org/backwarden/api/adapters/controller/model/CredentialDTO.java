@@ -4,7 +4,6 @@ import org.backwarden.api.logic.model.Vault;
 
 public class CredentialDTO {
     private long id;
-    private VaultDTO vault;
     private String title;
     private boolean isPasswordSecure;
     private String username;
@@ -19,14 +18,6 @@ public class CredentialDTO {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public VaultDTO getVault() {
-        return vault;
-    }
-
-    public void setVault(VaultDTO vault) {
-        this.vault = vault;
     }
 
     public String getTitle() {

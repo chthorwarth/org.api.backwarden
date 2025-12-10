@@ -12,7 +12,6 @@ public class CredentialDTOConverter {
     public static CredentialDTO toDTO(Credential credential) {
         CredentialDTO credentialDTO = new CredentialDTO();
         credentialDTO.setId(credential.getId());
-        credentialDTO.setVault(null);   //results in endless loop
         credentialDTO.setTitle(credential.getTitle());
         credentialDTO.setPassword(credential.getPassword());
         credentialDTO.setUsername(credential.getUsername());
