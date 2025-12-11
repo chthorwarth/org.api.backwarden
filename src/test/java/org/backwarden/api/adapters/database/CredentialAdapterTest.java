@@ -14,6 +14,7 @@ class CredentialAdapterTest
     @Inject
     CredentialAdapter adapter;
 
+    //Test of hexagonal architecture (return value)
     @Test
     @Transactional
     void getCredential()

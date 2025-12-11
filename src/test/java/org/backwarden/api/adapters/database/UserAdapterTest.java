@@ -15,6 +15,7 @@ class UserAdapterTest
     @Inject
     UserAdapter adapter;
 
+    //Test of hexagonal architecture (return value)
     @Test
     @Transactional
     void getUser()

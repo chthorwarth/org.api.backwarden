@@ -1,6 +1,7 @@
 package org.backwarden.api.logic.model;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class User
@@ -17,7 +18,7 @@ public class User
     private String masterPasswordSalt;
     private int failedLoginAttempts;
     private Instant lockedUntil;
-    private List<Vault> vaults;
+    private List<Vault> vaults = new ArrayList<>();
 
     public long getId()
     {

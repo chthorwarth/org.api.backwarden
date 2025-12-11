@@ -16,6 +16,7 @@ class VaultAdapterTest
     @Inject
     VaultAdapter adapter;
 
+    //Test of hexagonal architecture (return value)
     @Test
     @Transactional
     void getVault()
