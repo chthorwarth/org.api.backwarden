@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.backwarden.api.adapters.database.model.VaultEntity;
+import org.backwarden.api.logic.model.Vault;
 
 @ApplicationScoped
 
@@ -15,7 +16,9 @@ public class VaultAdapter {
     public void saveVault(VaultEntity vault) {
         entityManager.persist(vault);
     }
-    public VaultEntity getVault(long id) {
-        return entityManager.find(VaultEntity.class, id);
+    public Vault getVault(long id)
+    {
+        VaultEntity vaultEntity = entityManager.find(VaultEntity.class, id);
+        return new Vault();
     }
 }

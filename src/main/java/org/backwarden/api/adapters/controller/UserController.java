@@ -30,9 +30,11 @@ public class UserController {
         user.setMasterEmail("simon@thws");
         userAdapter.saveUser(user);
 
-        UserEntity userNew = userAdapter.getUser(1);
-        System.out.println(userNew.getMasterEmail());
-        return userNew.getMasterEmail();
+//        UserEntity userNew = userAdapter.getUser(1);
+//        System.out.println(userNew.getMasterEmail());
+
+
+        return "hello";
 
     }
 }

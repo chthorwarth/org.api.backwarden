@@ -37,10 +37,8 @@ public class TestDB
     EntityManager em;
     UserEntity user = new UserEntity();
     @Transactional
-
     void init()
     {
-
         List<CredentialEntity> credentials = new ArrayList<CredentialEntity>();
         credentials.add(new CredentialEntity());
 
@@ -75,10 +73,10 @@ public class TestDB
     }
     @Test
     @Transactional
-    void testDbInit(){
+    void testDbInit()
+    {
         init();
         UserEntity loaded = em.find(UserEntity.class, user.getId());
         assertEquals(user.getId(),  loaded.getId());
-
     }
 }
