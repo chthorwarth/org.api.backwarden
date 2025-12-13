@@ -9,11 +9,24 @@ public class UserDTO {
     private long id;
     private String masterEmail;
     private String masterPassword;
-    private String masterPasswordHash;
-    private String masterPasswordSalt;
     private int failedLoginAttempts;
     private Instant lockedUntil;
-    private List<VaultDTO> vaults;
+
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+
+    public Instant getLockedUntil() {
+        return lockedUntil;
+    }
+
+    public void setLockedUntil(Instant lockedUntil) {
+        this.lockedUntil = lockedUntil;
+    }
 
     public long getId() {
         return id;
@@ -39,43 +52,4 @@ public class UserDTO {
         this.masterPassword = masterPassword;
     }
 
-    public String getMasterPasswordHash() {
-        return masterPasswordHash;
-    }
-
-    public void setMasterPasswordHash(String masterPasswordHash) {
-        this.masterPasswordHash = masterPasswordHash;
-    }
-
-    public String getMasterPasswordSalt() {
-        return masterPasswordSalt;
-    }
-
-    public void setMasterPasswordSalt(String masterPasswordSalt) {
-        this.masterPasswordSalt = masterPasswordSalt;
-    }
-
-    public int getFailedLoginAttempts() {
-        return failedLoginAttempts;
-    }
-
-    public void setFailedLoginAttempts(int failedLoginAttempts) {
-        this.failedLoginAttempts = failedLoginAttempts;
-    }
-
-    public Instant getLockedUntil() {
-        return lockedUntil;
-    }
-
-    public void setLockedUntil(Instant lockedUntil) {
-        this.lockedUntil = lockedUntil;
-    }
-
-    public List<VaultDTO> getVaults() {
-        return vaults;
-    }
-
-    public void setVaults(List<VaultDTO> vaults) {
-        this.vaults = vaults;
-    }
 }
