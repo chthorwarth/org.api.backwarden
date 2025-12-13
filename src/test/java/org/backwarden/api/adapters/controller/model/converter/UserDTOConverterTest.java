@@ -12,8 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserDTOConverterTest
-{
+class UserDTOConverterTest {
     @Test
     void testToDTO() {
         User user = new User();
@@ -36,8 +35,6 @@ class UserDTOConverterTest
         assertEquals(user.getMasterEmail(), dto.getMasterEmail());
         assertEquals(user.getFailedLoginAttempts(), dto.getFailedLoginAttempts());
         assertEquals(user.getLockedUntil(), dto.getLockedUntil());
-        assertEquals(user.getVaults().size(), dto.getVaults().size());
-        assertEquals(user.getVaults().get(0).getId(), dto.getVaults().get(0).getId());
     }
 
     @Test
@@ -55,8 +52,6 @@ class UserDTOConverterTest
         vault.setCredentials(new ArrayList<>());
 
         vaults.add(vault);
-
-        dto.setVaults(vaults);
 
         User user = UserDTOConverter.fromDTO(dto);
 

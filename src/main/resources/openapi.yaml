@@ -23,15 +23,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                masterEmail:
-                  type: string
-                masterPassword:
-                  type: string
-              required:
-                - masterEmail
-                - masterPassword
+              $ref: '#/components/schemas/UserDTO'
       responses:
         '201':
           description: Created
@@ -43,6 +35,7 @@ paths:
         required: true
         schema:
           type: integer
+          format: int32
 
     get:
       tags: [ Users ]
@@ -53,12 +46,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  masterEmail:
-                    type: string
+                $ref: '#/components/schemas/UserDTO'
         '404':
           description: User not found
 
@@ -69,6 +57,7 @@ paths:
         required: true
         schema:
           type: integer
+          format: int32
 
     get:
       tags: [ Vaults ]
@@ -81,14 +70,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    title:
-                      type: string
-                    autoFill:
-                      type: boolean
+                  $ref: '#/components/schemas/VaultDTO'
 
     post:
       tags: [ Vaults ]
@@ -98,75 +80,10 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                autoFill:
-                  type: boolean
-              required:
-                - title
-                - autoFill
+              $ref: '#/components/schemas/VaultDTO'
       responses:
         '201':
           description: Created
-
-  /users/{userId}/vaults/{vaultId}:
-    parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
-
-      - name: vaultId
-        in: path
-        required: true
-        schema:
-          type: integer
-
-    put:
-      tags: [ Vaults ]
-      summary: Update an existing vault
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                autoFill:
-                  type: boolean
-              required:
-                - title
-                - autoFill
-      responses:
-        '200':
-          description: Vault updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  title:
-                    type: string
-                  autoFill:
-                    type: boolean
-        '404':
-          description: User or Vault not found
-
-    delete:
-      tags: [ Vaults ]
-      summary: Delete a vault
-      responses:
-        '204':
-          description: Vault deleted
-        '404':
-          description: User or Vault not found
 
   /vaults/{vaultId}/credentials:
     parameters:
@@ -175,6 +92,7 @@ paths:
         required: true
         schema:
           type: integer
+          format: int32
 
     get:
       tags: [ Credentials ]
@@ -187,16 +105,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    title:
-                      type: string
-                    username:
-                      type: string
-                    note:
-                      type: string
+                  $ref: '#/components/schemas/CredentialDTO'
 
     post:
       tags: [ Credentials ]
@@ -206,20 +115,62 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                username:
-                  type: string
-                password:
-                  type: string
-                note:
-                  type: string
-              required:
-                - title
-                - username
-                - password
+              $ref: '#/components/schemas/CredentialDTO'
       responses:
         '201':
           description: Created
+
+components:
+  schemas:
+
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        masterEmail:
+          type: string
+        masterPassword:
+          type: string
+        failedLoginAttempts:
+          type: integer
+        lockedUntil:
+          type: string
+          format: date-time
+      required:
+        - masterEmail
+        - masterPassword
+
+    VaultDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        autoFill:
+          type: boolean
+      required:
+        - title
+        - autoFill
+
+    CredentialDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        note:
+          type: string
+      required:
+        - title
+        - username
+        - password

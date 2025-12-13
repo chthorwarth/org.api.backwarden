@@ -5,19 +5,13 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
-import org.backwarden.api.adapters.controller.model.UserDTO;
-import org.backwarden.api.adapters.controller.model.interfaces.UsersApi;
-import org.backwarden.api.adapters.database.UserAdapter;
-import org.backwarden.api.adapters.database.model.UserEntity;
-import org.backwarden.api.logic.model.User;
-import org.openapitools.model.UsersPostRequest;
-import org.openapitools.model.UsersUserIdGet200Response;
-import org.openapitools.model.UsersUserIdVaultsGet200ResponseInner;
-import org.openapitools.model.UsersUserIdVaultsPostRequest;
+import org.openapitools.api.UsersApi;
+import org.openapitools.model.UserDTO;
 
 import java.util.List;
 
 @ApplicationScoped
+@Path("/")
 public class UserController implements UsersApi {
 
     @Override
@@ -29,7 +23,7 @@ public class UserController implements UsersApi {
     @Override
     public UserDTO usersUserIdGet(Integer userId) {
         UserDTO userDTO = new UserDTO();
-        userDTO.setId(1);
+        userDTO.id(1L);
         userDTO.setMasterEmail("test@test.de");
         return userDTO;
     }
