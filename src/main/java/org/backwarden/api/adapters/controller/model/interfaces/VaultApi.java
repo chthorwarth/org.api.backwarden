@@ -10,15 +10,14 @@ import org.backwarden.api.adapters.controller.model.VaultDTO;
  */
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2025-12-13T14:49:05.968114+01:00[Europe/Berlin]", comments = "Generator version: 7.17.0")
-@Path("/vaults")
-public interface VaultApi
-{
+public interface VaultApi {
 
     /**
      * @param vaultDTO
      * @return Created
      */
     @POST
+    @Path("/vaults")
     @Consumes({"application/json"})
     void vaultsPost(@Valid @NotNull VaultDTO vaultDTO);
 
@@ -29,7 +28,7 @@ public interface VaultApi
      * @return User not found
      */
     @GET
-    @Path("/{vaultId}")
+    @Path("/vaults/{vaultId}")
     @Produces({"application/json"})
     VaultDTO vaultsVaultIdGet(@PathParam("vaultId") Integer vaultId);
 

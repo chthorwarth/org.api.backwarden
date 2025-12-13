@@ -1,18 +1,27 @@
 package org.backwarden.api.adapters.controller;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import org.backwarden.api.adapters.controller.model.UserDTO;
-import org.backwarden.api.adapters.controller.model.VaultDTO;
-import org.backwarden.api.adapters.controller.model.interfaces.VaultApi;
-import org.backwarden.api.adapters.database.VaultAdapter;
-import org.backwarden.api.adapters.database.model.VaultEntity;
+import org.openapitools.api.VaultsApi;
+import org.openapitools.model.VaultDTO;
+
 
 @ApplicationScoped
-public class VaultController implements VaultApi
-{
+@Path("/")
+public class VaultController implements VaultsApi {
+    @Override
+    public void vaultsPost(VaultDTO vaultDTO) {
+        System.out.println(vaultDTO.getTitle());
+    }
+
+    @Override
+    public VaultDTO vaultsVaultIdGet(Integer vaultId) {
+        VaultDTO vaultDTO = new VaultDTO();
+        vaultDTO.id(1L);
+        vaultDTO.setTitle("TestVault");
+        return vaultDTO;
+    }
+
 //    @Inject
 //    VaultAdapter vaultAdapter;
 //
@@ -41,18 +50,5 @@ public class VaultController implements VaultApi
 //
 //    }
 
-    @Override
-    public void vaultsPost(VaultDTO vaultDTO)
-    {
-        System.out.println(vaultDTO.getTitle());
-    }
 
-    @Override
-    public VaultDTO vaultsVaultIdGet(Integer vaultId)
-    {
-        VaultDTO vaultDTO = new VaultDTO();
-        vaultDTO.setId(1);
-        vaultDTO.setTitle("TestVault");
-        return vaultDTO;
-    }
 }

@@ -50,31 +50,10 @@ paths:
         '404':
           description: User not found
 
-  /users/{userId}/vaults:
-    parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-
-    get:
-      tags: [ Vaults ]
-      summary: Get all vaults for a user
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VaultDTO'
-
+  /vaults:
     post:
       tags: [ Vaults ]
-      summary: Create a new vault for a user
+      summary: Create a vault
       requestBody:
         required: true
         content:
@@ -84,6 +63,28 @@ paths:
       responses:
         '201':
           description: Created
+
+  /vaults/{vaultId}:
+    parameters:
+      - name: vaultId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+
+    get:
+      tags: [ Vaults ]
+      summary: Get vault by id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultDTO'
+        '404':
+          description: Vault not found
 
   /vaults/{vaultId}/credentials:
     parameters:
@@ -152,6 +153,10 @@ components:
           type: string
         autoFill:
           type: boolean
+        credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/CredentialDTO'
       required:
         - title
         - autoFill
