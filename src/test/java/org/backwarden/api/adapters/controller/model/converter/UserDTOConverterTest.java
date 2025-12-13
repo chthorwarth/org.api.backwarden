@@ -36,8 +36,6 @@ class UserDTOConverterTest
         assertEquals(user.getMasterEmail(), dto.getMasterEmail());
         assertEquals(user.getFailedLoginAttempts(), dto.getFailedLoginAttempts());
         assertEquals(user.getLockedUntil(), dto.getLockedUntil());
-        assertEquals(user.getVaults().size(), dto.getVaults().size());
-        assertEquals(user.getVaults().get(0).getId(), dto.getVaults().get(0).getId());
     }
 
     @Test
@@ -56,7 +54,6 @@ class UserDTOConverterTest
 
         vaults.add(vault);
 
-        dto.setVaults(vaults);
 
         User user = UserDTOConverter.fromDTO(dto);
 
