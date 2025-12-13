@@ -169,13 +169,18 @@ components:
           format: int64
         title:
           type: string
+        isPasswordSecure:
+          type: boolean
         username:
           type: string
         password:
+          type: string
+        passwordCiphertext:
+          type: string
+        passwordIV:
           type: string
         note:
           type: string
       required:
         - title
         - username
-        - password
