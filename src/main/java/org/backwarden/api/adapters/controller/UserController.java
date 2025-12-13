@@ -10,10 +10,7 @@ import org.backwarden.api.adapters.controller.model.interfaces.UsersApi;
 import org.backwarden.api.adapters.database.UserAdapter;
 import org.backwarden.api.adapters.database.model.UserEntity;
 import org.backwarden.api.logic.model.User;
-import org.openapitools.model.UsersPostRequest;
-import org.openapitools.model.UsersUserIdGet200Response;
-import org.openapitools.model.UsersUserIdVaultsGet200ResponseInner;
-import org.openapitools.model.UsersUserIdVaultsPostRequest;
+
 
 import java.util.List;
 
