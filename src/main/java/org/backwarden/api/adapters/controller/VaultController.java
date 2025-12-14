@@ -5,22 +5,27 @@ import jakarta.ws.rs.Path;
 import org.openapitools.api.VaultsApi;
 import org.openapitools.model.VaultDTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @ApplicationScoped
 @Path("/")
 public class VaultController implements VaultsApi {
 
     @Override
-    public void usersUserIdVaultsPost(Integer userId, VaultDTO vaultDTO) {
-        System.out.println(vaultDTO.getTitle());
-    }
-
-    @Override
-    public VaultDTO usersUserIdVaultsVaultIdGet(Integer userId, Integer vaultId) {
+    public List<VaultDTO> usersUserIdVaultsGet(Integer userId) {
+        List<VaultDTO> vaultDTOS = new ArrayList<>();
         VaultDTO vaultDTO = new VaultDTO();
         vaultDTO.id(1L);
         vaultDTO.setTitle("TestVault");
-        return vaultDTO;
+        vaultDTOS.add(vaultDTO);
+        return vaultDTOS;
+    }
+
+    @Override
+    public void usersUserIdVaultsPost(Integer userId, VaultDTO vaultDTO) {
+        System.out.println(vaultDTO.getTitle());
     }
 
 //    @Inject

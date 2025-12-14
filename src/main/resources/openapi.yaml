@@ -59,6 +59,21 @@ paths:
           type: integer
           format: int32
 
+    get:
+      tags: [ Vaults ]
+      summary: Get all vaults for a user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VaultDTO'
+        '404':
+          description: User not found
+
     post:
       tags: [ Vaults ]
       summary: Create a vault for a user
@@ -71,34 +86,6 @@ paths:
       responses:
         '201':
           description: Created
-
-  /users/{userId}/vaults/{vaultId}:
-    parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      - name: vaultId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-
-    get:
-      tags: [ Vaults ]
-      summary: Get vault by id for a user
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VaultDTO'
-        '404':
-          description: Vault not found
 
   /vaults/{vaultId}/credentials:
     parameters:
