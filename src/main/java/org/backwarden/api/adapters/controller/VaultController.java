@@ -17,7 +17,6 @@ import java.util.List;
 public class VaultController implements VaultsApi {
 
     @Override
-
     public Response usersUserIdVaultsGet(Integer userId) {
         VaultWrapperDTO vaultWrapperDTO = new VaultWrapperDTO();
         vaultWrapperDTO.setSelfLink(URI.create("/users/" + userId + "/vaults"));
