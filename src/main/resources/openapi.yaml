@@ -50,10 +50,18 @@ paths:
         '404':
           description: User not found
 
-  /vaults:
+  /users/{userId}/vaults:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+
     post:
       tags: [ Vaults ]
-      summary: Create a vault
+      summary: Create a vault for a user
       requestBody:
         required: true
         content:
@@ -64,8 +72,14 @@ paths:
         '201':
           description: Created
 
-  /vaults/{vaultId}:
+  /users/{userId}/vaults/{vaultId}:
     parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
       - name: vaultId
         in: path
         required: true
@@ -75,7 +89,7 @@ paths:
 
     get:
       tags: [ Vaults ]
-      summary: Get vault by id
+      summary: Get vault by id for a user
       responses:
         '200':
           description: OK

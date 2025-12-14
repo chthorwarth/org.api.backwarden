@@ -9,13 +9,14 @@ import org.openapitools.model.VaultDTO;
 @ApplicationScoped
 @Path("/")
 public class VaultController implements VaultsApi {
+
     @Override
-    public void vaultsPost(VaultDTO vaultDTO) {
+    public void usersUserIdVaultsPost(Integer userId, VaultDTO vaultDTO) {
         System.out.println(vaultDTO.getTitle());
     }
 
     @Override
-    public VaultDTO vaultsVaultIdGet(Integer vaultId) {
+    public VaultDTO usersUserIdVaultsVaultIdGet(Integer userId, Integer vaultId) {
         VaultDTO vaultDTO = new VaultDTO();
         vaultDTO.id(1L);
         vaultDTO.setTitle("TestVault");
