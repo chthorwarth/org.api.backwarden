@@ -14,7 +14,9 @@ import org.backwarden.api.logic.ports.input.CredentialAPI;
 import org.backwarden.api.logic.services.CredentialService;
 import org.openapitools.api.CredentialsApi;
 import org.openapitools.model.CredentialDTO;
+import org.openapitools.model.CredentialWrapperDTO;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,13 +46,21 @@ public class CredentialController implements CredentialsApi {
     }
 
     @Override
-    public List<CredentialDTO> vaultsVaultIdCredentialsGet(Integer vaultId) {
+    public CredentialWrapperDTO vaultsVaultIdCredentialsGet(Integer vaultId) {
+        CredentialWrapperDTO wrapperDTO = new CredentialWrapperDTO();
         List<CredentialDTO> credentialDTOs = new ArrayList<>();
         CredentialDTO credentialDTO = new CredentialDTO();
         credentialDTO.id(1L);
         credentialDTO.setTitle("Credential");
         credentialDTOs.add(credentialDTO);
-        return credentialDTOs;
+        credentialDTO.setSelfLink(
+                URI.create("/vaults/" + vaultId + "/credentials/" + credentialDTO.getId())
+        );
+        wrapperDTO.credentialDTOS(credentialDTOs);
+        wrapperDTO.setSelfLink(
+                URI.create("/vaults/" + vaultId + "/credentials/")
+        );
+        return wrapperDTO;
     }
 
     @Override

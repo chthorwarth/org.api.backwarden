@@ -141,16 +141,14 @@ paths:
 
     get:
       tags: [ Credentials ]
-      summary: Get all credentials in a vault
+      summary: Get all credentials in a vault (Wrapped)
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CredentialDTO'
+                $ref: '#/components/schemas/CredentialWrapperDTO' # <--- HIER GEÄNDERT
 
     post:
       tags: [ Credentials ]
@@ -193,7 +191,7 @@ paths:
         '404':
           description: Vault or credential not found
 
-    put: # NEUE PUT OPERATION ERGÄNZUNG
+    put:
       tags: [ Credentials ]
       summary: Update (replace) a specific credential by id in a vault
       requestBody:
@@ -262,12 +260,28 @@ components:
         - title
         - autoFill
 
+    # NEU: Der Wrapper für die Liste + SelfLink
+    CredentialWrapperDTO:
+      type: object
+      properties:
+        selfLink:
+          type: string
+          format: uri
+        credentialDTOS:
+          type: array
+          items:
+            $ref: '#/components/schemas/CredentialDTO'
+
     CredentialDTO:
       type: object
       properties:
         id:
           type: integer
           format: int64
+        selfLink:
+          type: string
+          format: uri
+          readOnly: true
         title:
           type: string
         isPasswordSecure:
