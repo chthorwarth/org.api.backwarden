@@ -2,9 +2,12 @@ package org.backwarden.api.adapters.controller;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
 import org.openapitools.api.VaultsApi;
 import org.openapitools.model.VaultDTO;
+import org.openapitools.model.VaultWrapperDTO;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,29 +17,35 @@ import java.util.List;
 public class VaultController implements VaultsApi {
 
     @Override
-    public List<VaultDTO> usersUserIdVaultsGet(Integer userId) {
+
+    public Response usersUserIdVaultsGet(Integer userId) {
+        VaultWrapperDTO vaultWrapperDTO = new VaultWrapperDTO();
+        vaultWrapperDTO.setSelfLink(URI.create("/users/" + userId + "/vaults"));
         List<VaultDTO> vaultDTOS = new ArrayList<>();
         VaultDTO vaultDTO = new VaultDTO();
         vaultDTO.id(1L);
         vaultDTO.setTitle("TestVault");
         vaultDTOS.add(vaultDTO);
-        return vaultDTOS;
+        vaultWrapperDTO.setVaultDTOS(vaultDTOS);
+        return Response.ok(vaultWrapperDTO).build();
     }
 
     @Override
-    public void usersUserIdVaultsPost(Integer userId, VaultDTO vaultDTO) {
+    public Response usersUserIdVaultsPost(Integer userId, VaultDTO vaultDTO) {
         System.out.println(vaultDTO.getTitle());
+        return Response.ok().build();
     }
 
     @Override
-    public void usersUserIdVaultsVaultIdDelete(Integer userId, Integer vaultId)
-    {
+    public Response usersUserIdVaultsVaultIdDelete(Integer userId, Integer vaultId) {
         System.out.println("Vault deleted: " + vaultId);
+        return Response.ok().build();
     }
 
     @Override
-    public VaultDTO usersUserIdVaultsVaultIdPut(Integer userId, Integer vaultId, VaultDTO vaultDTO) {
-        return vaultDTO;
+    public Response usersUserIdVaultsVaultIdPut(Integer userId, Integer vaultId, VaultDTO vaultDTO) {
+        vaultDTO.setSelfLink(URI.create("/users/" + userId + "/vaults/" + vaultId));
+        return Response.ok(vaultDTO).build();
     }
 
 //    @Inject

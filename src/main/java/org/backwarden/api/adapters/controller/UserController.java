@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import org.openapitools.api.UsersApi;
 import org.openapitools.model.UserDTO;
 
@@ -15,17 +16,18 @@ import java.util.List;
 public class UserController implements UsersApi {
 
     @Override
-    public void usersPost(@Valid @NotNull UserDTO userDTO) {
+    public Response usersPost(@Valid @NotNull UserDTO userDTO) {
         System.out.println(userDTO.getMasterEmail());
+        return Response.ok().build();
     }
 
 
     @Override
-    public UserDTO usersUserIdGet(Integer userId) {
+    public Response usersUserIdGet(Integer userId) {
         UserDTO userDTO = new UserDTO();
         userDTO.id(1L);
         userDTO.setMasterEmail("test@test.de");
-        return userDTO;
+        return Response.ok().build();
     }
 
 //    @Inject
