@@ -121,6 +121,15 @@ paths:
         '404':
           description: User or vault not found
 
+    delete:
+      tags: [ Vaults ]
+      summary: Delete a vault for a user
+      responses:
+        '204':
+          description: Vault successfully deleted
+        '404':
+          description: User or vault not found
+
   /vaults/{vaultId}/credentials:
     parameters:
       - name: vaultId

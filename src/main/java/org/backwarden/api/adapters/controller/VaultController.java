@@ -29,6 +29,12 @@ public class VaultController implements VaultsApi {
     }
 
     @Override
+    public void usersUserIdVaultsVaultIdDelete(Integer userId, Integer vaultId)
+    {
+        System.out.println("Vault deleted: " + vaultId);
+    }
+
+    @Override
     public VaultDTO usersUserIdVaultsVaultIdPut(Integer userId, Integer vaultId, VaultDTO vaultDTO) {
         return vaultDTO;
     }
