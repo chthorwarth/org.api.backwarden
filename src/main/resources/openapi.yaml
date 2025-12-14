@@ -61,16 +61,14 @@ paths:
 
     get:
       tags: [ Vaults ]
-      summary: Get all vaults for a user
+      summary: Get all vaults for a user (Wrapped)
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VaultDTO'
+                $ref: '#/components/schemas/VaultWrapperDTO'
         '404':
           description: User not found
 
@@ -148,7 +146,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CredentialWrapperDTO' # <--- HIER GEÄNDERT
+                $ref: '#/components/schemas/CredentialWrapperDTO'
 
     post:
       tags: [ Credentials ]
@@ -219,7 +217,6 @@ paths:
         '404':
           description: Vault or credential not found
 
-
 components:
   schemas:
 
@@ -256,11 +253,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CredentialDTO'
+        selfLink:
+          type: string
+          format: uri
+          readOnly: true
       required:
         - title
         - autoFill
 
-    # NEU: Der Wrapper für die Liste + SelfLink
+    VaultWrapperDTO:
+      type: object
+      properties:
+        selfLink:
+          type: string
+          format: uri
+        vaultDTOS:
+          type: array
+          items:
+            $ref: '#/components/schemas/VaultDTO'
+
     CredentialWrapperDTO:
       type: object
       properties:

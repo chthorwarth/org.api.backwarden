@@ -5,6 +5,7 @@ import jakarta.ws.rs.Path;
 import org.openapitools.api.VaultsApi;
 import org.openapitools.model.VaultDTO;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +15,16 @@ import java.util.List;
 public class VaultController implements VaultsApi {
 
     @Override
-    public List<VaultDTO> usersUserIdVaultsGet(Integer userId) {
+    public org.openapitools.model.VaultWrapperDTO usersUserIdVaultsGet(Integer userId) {
+        org.openapitools.model.VaultWrapperDTO vaultWrapperDTO = new org.openapitools.model.VaultWrapperDTO();
+        vaultWrapperDTO.setSelfLink(URI.create("/users/" + userId + "/vaults"));
         List<VaultDTO> vaultDTOS = new ArrayList<>();
         VaultDTO vaultDTO = new VaultDTO();
         vaultDTO.id(1L);
         vaultDTO.setTitle("TestVault");
         vaultDTOS.add(vaultDTO);
-        return vaultDTOS;
+        vaultWrapperDTO.setVaultDTOS(vaultDTOS);
+        return vaultWrapperDTO;
     }
 
     @Override
@@ -36,6 +40,7 @@ public class VaultController implements VaultsApi {
 
     @Override
     public VaultDTO usersUserIdVaultsVaultIdPut(Integer userId, Integer vaultId, VaultDTO vaultDTO) {
+        vaultDTO.setSelfLink(URI.create("/users/" + userId + "/vaults/" + vaultId));
         return vaultDTO;
     }
 
