@@ -165,6 +165,63 @@ paths:
         '201':
           description: Created
 
+  /vaults/{vaultId}/credentials/{credentialId}:
+    parameters:
+      - name: vaultId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: credentialId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+
+    get:
+      tags: [ Credentials ]
+      summary: Get a specific credential by id in a vault
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialDTO'
+        '404':
+          description: Vault or credential not found
+
+    put: # NEUE PUT OPERATION ERGÄNZUNG
+      tags: [ Credentials ]
+      summary: Update (replace) a specific credential by id in a vault
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialDTO'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialDTO'
+        '404':
+          description: Vault or credential not found
+
+    delete:
+      tags: [ Credentials ]
+      summary: Delete a specific credential by id in a vault
+      responses:
+        '204':
+          description: No Content (Successfully deleted)
+        '404':
+          description: Vault or credential not found
+
+
 components:
   schemas:
 
