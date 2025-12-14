@@ -28,6 +28,11 @@ public class VaultController implements VaultsApi {
         System.out.println(vaultDTO.getTitle());
     }
 
+    @Override
+    public VaultDTO usersUserIdVaultsVaultIdPut(Integer userId, Integer vaultId, VaultDTO vaultDTO) {
+        return vaultDTO;
+    }
+
 //    @Inject
 //    VaultAdapter vaultAdapter;
 //
