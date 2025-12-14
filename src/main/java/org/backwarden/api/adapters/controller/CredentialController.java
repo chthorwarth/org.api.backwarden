@@ -23,6 +23,27 @@ import java.util.List;
 public class CredentialController implements CredentialsApi {
 
     @Override
+    public void vaultsVaultIdCredentialsCredentialIdDelete(Integer vaultId, Integer credentialId) {
+        System.out.printf("Deleted credential");
+    }
+
+    @Override
+    public CredentialDTO vaultsVaultIdCredentialsCredentialIdGet(Integer vaultId, Integer credentialId) {
+
+        CredentialDTO credentialDTO = new CredentialDTO();
+        credentialDTO.id(1L);
+        credentialDTO.setTitle("Credential");
+        return credentialDTO;
+    }
+
+    @Override
+    public CredentialDTO vaultsVaultIdCredentialsCredentialIdPut(Integer vaultId, Integer credentialId, CredentialDTO credentialDTO) {
+        credentialDTO.id(1L);
+        credentialDTO.setTitle("CredentialVault");
+        return credentialDTO;
+    }
+
+    @Override
     public List<CredentialDTO> vaultsVaultIdCredentialsGet(Integer vaultId) {
         List<CredentialDTO> credentialDTOs = new ArrayList<>();
         CredentialDTO credentialDTO = new CredentialDTO();
