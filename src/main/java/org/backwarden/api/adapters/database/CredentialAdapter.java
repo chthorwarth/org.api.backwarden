@@ -24,4 +24,17 @@ public class CredentialAdapter implements CredentialRepository {
         CredentialEntity ce = entityManager.find(CredentialEntity.class, id);
         return new Credential();
     }
+
+   /* @Override
+    public List<Credential> getAllCredentials(long vaultId)
+    {
+        VaultEntity vaultEntity = entityManager.find(VaultEntity.class, vaultId);
+
+        List<CredentialEntity> credentialEntities = entityManager.createQuery("SELECT c FROM CredentialEntity c WHERE c.vault = :vaultEntity", CredentialEntity.class)
+                .setParameter("vaultEntity",vaultEntity)
+                .getResultList();
+
+        return CredentialEntityConverter.fromEntityList(credentialEntities);
+    }*/
+
 }

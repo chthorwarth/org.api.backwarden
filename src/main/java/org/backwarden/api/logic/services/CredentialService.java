@@ -1,10 +1,13 @@
 package org.backwarden.api.logic.services;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import org.backwarden.api.logic.model.Credential;
-import org.backwarden.api.logic.ports.input.CredentialAPI;
+import org.backwarden.api.logic.ports.input.CredentialUseCase;
 import org.backwarden.api.logic.ports.output.persistence.CredentialRepository;
 
-public class CredentialService implements CredentialAPI
+
+@ApplicationScoped
+public class CredentialService implements CredentialUseCase
 {
 	CredentialRepository credentialRepository;
 
@@ -13,6 +16,7 @@ public class CredentialService implements CredentialAPI
 		credentialRepository.saveCredential(new Credential());
 	}
 
+	//TODO change id into long!
 	@Override
 	public Credential getCredential(int id) {
 		return credentialRepository.getCredential(id);

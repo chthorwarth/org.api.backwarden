@@ -1,7 +1,11 @@
 package org.backwarden.api.adapters.database.model.converter;
 
+import org.backwarden.api.adapters.database.model.CredentialEntity;
 import org.backwarden.api.adapters.database.model.UserEntity;
+import org.backwarden.api.logic.model.Credential;
 import org.backwarden.api.logic.model.User;
+
+import java.util.List;
 
 public class UserEntityConverter
 {
@@ -35,5 +39,19 @@ public class UserEntityConverter
         user.setMasterPasswordSalt(userEntity.getMasterPasswordSalt());
 
         return user;
+    }
+
+    public static List<UserEntity> toEntityList(List<User> users)
+    {
+        return users.stream()
+                .map(UserEntityConverter::toEntity)
+                .toList();
+    }
+
+    public static List<User> fromEntityList(List<UserEntity> userEntities)
+    {
+        return userEntities.stream()
+                .map(UserEntityConverter::fromEntity)
+                .toList();
     }
 }

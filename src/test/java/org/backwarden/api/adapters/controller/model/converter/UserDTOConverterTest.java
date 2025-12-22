@@ -1,12 +1,11 @@
 package org.backwarden.api.adapters.controller.model.converter;
 
-import org.backwarden.api.adapters.controller.model.UserDTO;
 import org.backwarden.api.adapters.controller.model.VaultDTO;
 import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.model.Vault;
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.UserDTO;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +39,7 @@ class UserDTOConverterTest {
     @Test
     void testFromDTO() {
         UserDTO dto = new UserDTO();
-        dto.setId(1);
+        dto.setId(1L);
         dto.setMasterEmail("test@test.de");
         dto.setFailedLoginAttempts(0);
         dto.setMasterPassword("testpass");
