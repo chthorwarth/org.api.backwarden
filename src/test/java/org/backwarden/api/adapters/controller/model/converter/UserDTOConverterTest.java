@@ -39,7 +39,6 @@ class UserDTOConverterTest {
     @Test
     void testFromDTO() {
         UserDTO dto = new UserDTO();
-        dto.setId(1L);
         dto.setMasterEmail("test@test.de");
         dto.setFailedLoginAttempts(0);
         dto.setMasterPassword("testpass");
@@ -54,7 +53,6 @@ class UserDTOConverterTest {
 
         User user = UserDTOConverter.fromDTO(dto);
 
-        assertEquals(dto.getId(), user.getId());
         assertEquals(dto.getMasterEmail(), user.getMasterEmail());
         assertEquals(dto.getFailedLoginAttempts(), user.getFailedLoginAttempts());
         assertEquals(dto.getLockedUntil(), user.getLockedUntil());

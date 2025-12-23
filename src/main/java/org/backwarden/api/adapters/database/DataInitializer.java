@@ -8,7 +8,7 @@ import jakarta.persistence.EntityManager;
 import org.backwarden.api.adapters.database.model.CredentialEntity;
 import org.backwarden.api.adapters.database.model.UserEntity;
 import org.backwarden.api.adapters.database.model.VaultEntity;
-
+/*
 @ApplicationScoped
 public class DataInitializer
 {
@@ -70,3 +70,4 @@ public class DataInitializer
         System.out.println("Testdaten für User, Vaults und Credentials wurden angelegt.");
     }
 }
+ */

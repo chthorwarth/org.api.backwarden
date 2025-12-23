@@ -7,10 +7,8 @@ import org.backwarden.api.logic.model.User;
 
 import java.util.List;
 
-public class UserEntityConverter
-{
-    public static UserEntity toEntity(User user)
-    {
+public class UserEntityConverter {
+    public static UserEntity toEntity(User user) {
         UserEntity userEntity = new UserEntity();
 
         userEntity.setId(user.getId());
@@ -25,8 +23,7 @@ public class UserEntityConverter
         return userEntity;
     }
 
-    public static User fromEntity(UserEntity userEntity)
-    {
+    public static User fromEntity(UserEntity userEntity) {
         User user = new User();
 
         user.setId(userEntity.getId());
@@ -40,7 +37,7 @@ public class UserEntityConverter
 
         return user;
     }
-
+/*
     public static List<UserEntity> toEntityList(List<User> users)
     {
         return users.stream()
@@ -54,4 +51,5 @@ public class UserEntityConverter
                 .map(UserEntityConverter::fromEntity)
                 .toList();
     }
+ */
 }

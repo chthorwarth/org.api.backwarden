@@ -13,7 +13,6 @@ import java.util.List;
 
 
 @ApplicationScoped
-@Path("/")
 public class VaultController implements VaultsApi {
 
     @Override
