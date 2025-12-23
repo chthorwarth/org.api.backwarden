@@ -12,7 +12,6 @@ import org.openapitools.model.UserDTO;
 import java.util.List;
 
 @ApplicationScoped
-@Path("/")
 public class UserController implements UsersApi {
 
     @Override

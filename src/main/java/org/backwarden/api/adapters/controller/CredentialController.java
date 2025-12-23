@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
-@Path("/")
 public class CredentialController implements CredentialsApi {
 
     @Override
