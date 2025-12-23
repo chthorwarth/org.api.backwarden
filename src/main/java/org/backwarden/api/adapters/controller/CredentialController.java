@@ -3,16 +3,10 @@ package org.backwarden.api.adapters.controller;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
-import org.backwarden.api.logic.model.Credential;
-import org.backwarden.api.logic.ports.input.CredentialAPI;
-import org.backwarden.api.logic.services.CredentialService;
+
+
+
 import org.openapitools.api.CredentialsApi;
 import org.openapitools.model.CredentialDTO;
 import org.openapitools.model.CredentialWrapperDTO;
@@ -23,6 +17,7 @@ import java.util.List;
 
 @ApplicationScoped
 public class CredentialController implements CredentialsApi {
+
 
     @Override
     public Response vaultsVaultIdCredentialsCredentialIdDelete(Integer vaultId, Integer credentialId) {

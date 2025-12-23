@@ -1,12 +1,14 @@
 package org.backwarden.api.adapters.database.model.converter;
 
+import org.backwarden.api.adapters.database.model.CredentialEntity;
 import org.backwarden.api.adapters.database.model.UserEntity;
+import org.backwarden.api.logic.model.Credential;
 import org.backwarden.api.logic.model.User;
 
-public class UserEntityConverter
-{
-    public static UserEntity toEntity(User user)
-    {
+import java.util.List;
+
+public class UserEntityConverter {
+    public static UserEntity toEntity(User user) {
         UserEntity userEntity = new UserEntity();
 
         userEntity.setId(user.getId());
@@ -21,8 +23,7 @@ public class UserEntityConverter
         return userEntity;
     }
 
-    public static User fromEntity(UserEntity userEntity)
-    {
+    public static User fromEntity(UserEntity userEntity) {
         User user = new User();
 
         user.setId(userEntity.getId());
@@ -36,4 +37,19 @@ public class UserEntityConverter
 
         return user;
     }
+/*
+    public static List<UserEntity> toEntityList(List<User> users)
+    {
+        return users.stream()
+                .map(UserEntityConverter::toEntity)
+                .toList();
+    }
+
+    public static List<User> fromEntityList(List<UserEntity> userEntities)
+    {
+        return userEntities.stream()
+                .map(UserEntityConverter::fromEntity)
+                .toList();
+    }
+ */
 }

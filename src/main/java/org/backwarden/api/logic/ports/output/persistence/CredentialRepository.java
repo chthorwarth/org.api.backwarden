@@ -8,4 +8,5 @@ public interface CredentialRepository
 	public void saveCredential(Credential credential);
 
 	public Credential getCredential(long id);
+
 }
