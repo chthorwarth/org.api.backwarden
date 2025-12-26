@@ -12,6 +12,7 @@ public class UserEntity {
     // strategy identity: database is responsible for generating the id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(unique = true)
     private String masterEmail;
     private String masterPasswordHash;
     private String masterPasswordSalt;
