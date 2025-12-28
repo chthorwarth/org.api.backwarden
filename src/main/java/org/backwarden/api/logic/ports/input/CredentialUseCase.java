@@ -8,9 +8,11 @@ public interface CredentialUseCase
 {
 	public void createCredentials(Credential credential);
 
-	public Credential getCredential(int id);
+	public Credential getCredential(long id);
 
-	//public List<Credential> getAllCredentials(long vaultId);
+	public List<Credential> getAllCredentials(long vaultId);
 
+	public void deleteCredential(long id);
 
+	public void updateCredential(long id, Credential credential);
 }

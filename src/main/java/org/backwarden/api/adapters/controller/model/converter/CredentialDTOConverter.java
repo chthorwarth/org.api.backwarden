@@ -2,8 +2,8 @@ package org.backwarden.api.adapters.controller.model.converter;
 
 
 import org.backwarden.api.logic.model.Credential;
-import org.backwarden.api.logic.model.Vault;
 import org.openapitools.model.CredentialDTO;
+
 
 import java.util.List;
 
@@ -23,7 +23,6 @@ public class CredentialDTOConverter {
     }
     public static Credential fromDTO(CredentialDTO credentialDTO) {
         Credential credential = new Credential();
-        credential.setId(credentialDTO.getId());
         credential.setVault(null);  //results in endless loop
         credential.setTitle(credentialDTO.getTitle());
 
@@ -31,6 +30,7 @@ public class CredentialDTOConverter {
         credential.setPassword(credentialDTO.getPassword());
         credential.setPasswordCiphertext(credentialDTO.getPasswordCiphertext());
         credential.setPasswordIV(credentialDTO.getPasswordIV());
+
         return credential;
     }
 

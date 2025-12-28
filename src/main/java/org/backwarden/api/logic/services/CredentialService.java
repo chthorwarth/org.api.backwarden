@@ -1,24 +1,45 @@
 package org.backwarden.api.logic.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.backwarden.api.logic.model.Credential;
 import org.backwarden.api.logic.ports.input.CredentialUseCase;
 import org.backwarden.api.logic.ports.output.persistence.CredentialRepository;
+
+import java.util.List;
 
 
 @ApplicationScoped
 public class CredentialService implements CredentialUseCase
 {
-	CredentialRepository credentialRepository;
+	@Inject
+	CredentialRepository credentialAdapter;
 
 	@Override
 	public void createCredentials(Credential credential) {
-		credentialRepository.saveCredential(new Credential());
+		credentialAdapter.saveCredential(credential);
 	}
 
-	//TODO change id into long!
 	@Override
-	public Credential getCredential(int id) {
-		return credentialRepository.getCredential(id);
+	public Credential getCredential(long id) {
+		return credentialAdapter.getCredential(id);
+	}
+
+	@Override
+	public List<Credential> getAllCredentials(long vaultId)
+	{
+		return credentialAdapter.getAllCredentials(vaultId);
+	}
+
+	@Override
+	public void deleteCredential(long id)
+	{
+		credentialAdapter.deleteCredential(id);
+	}
+
+	@Override
+	public void updateCredential(long id, Credential credential)
+	{
+		credentialAdapter.updateCredential(id, credential);
 	}
 }
