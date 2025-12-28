@@ -16,8 +16,8 @@ public class CredentialService implements CredentialUseCase
 	CredentialRepository credentialAdapter;
 
 	@Override
-	public void createCredentials(Credential credential) {
-		credentialAdapter.saveCredential(credential);
+	public void createCredentials(Credential credential, long vaultId) {
+		credentialAdapter.saveCredential(credential, vaultId);
 	}
 
 	@Override

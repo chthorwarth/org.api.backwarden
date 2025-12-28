@@ -25,7 +25,7 @@ public class VaultController implements VaultsApi {
         VaultWrapperDTO vaultWrapperDTO = new VaultWrapperDTO();
         vaultWrapperDTO.setSelfLink(URI.create("/users/" + userId + "/vaults"));
 
-        List<VaultDTO> vaultDTOS = VaultDTOConverter.toDTOList(vaultService.getAllVaults());
+        List<VaultDTO> vaultDTOS = VaultDTOConverter.toDTOList(vaultService.getAllVaults(userId));
 
         //Do we set the self-link here or in the converter?
 
@@ -40,7 +40,7 @@ public class VaultController implements VaultsApi {
 
     @Override
     public Response usersUserIdVaultsPost(Integer userId, VaultDTO vaultDTO) {
-        vaultService.createVault(VaultDTOConverter.fromDTO(vaultDTO));
+        vaultService.createVault(userId,VaultDTOConverter.fromDTO(vaultDTO));
         return Response.ok().build();
     }
 

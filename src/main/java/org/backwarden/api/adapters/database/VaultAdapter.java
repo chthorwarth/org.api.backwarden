@@ -6,7 +6,9 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.backwarden.api.adapters.database.model.UserEntity;
 import org.backwarden.api.adapters.database.model.VaultEntity;
+import org.backwarden.api.adapters.database.model.converter.UserEntityConverter;
 import org.backwarden.api.adapters.database.model.converter.VaultEntityConverter;
+import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.model.Vault;
 import org.backwarden.api.logic.ports.output.persistence.VaultRepository;
 
@@ -21,9 +23,13 @@ public class VaultAdapter implements VaultRepository
 
     @Transactional
     @Override
-    public void saveVault(Vault vault)
+    public void saveVault(long userId, Vault vault)
     {
-        entityManager.persist(VaultEntityConverter.toEntity(vault));
+        UserEntity userEntity = entityManager.find(UserEntity.class, userId);
+        VaultEntity vaultEntity = VaultEntityConverter.toEntity(vault);
+        vaultEntity.setUser(userEntity);
+
+        entityManager.persist(vaultEntity);
     }
 
     /*public Vault getVault(long id)
@@ -63,11 +69,17 @@ public class VaultAdapter implements VaultRepository
     }
 
     @Override
-    public List<Vault> getAllVaults()
+    public List<Vault> getAllVaults(long userId)
     {
-        List<VaultEntity> vaultEntities = entityManager.createQuery("SELECT v FROM VaultEntity v", VaultEntity.class)
+        List<VaultEntity> vaultEntities = entityManager.createQuery("SELECT v FROM VaultEntity v WHERE v.user.id = :userId", VaultEntity.class)
+                .setParameter("userId", userId)
                 .getResultList();
+        if (vaultEntities.isEmpty())
+        {
+            throw new NotFoundException("No vaults found");
+        }
+        User user = UserEntityConverter.fromEntity(vaultEntities.get(0).getUser());
 
-        return VaultEntityConverter.fromEntityList(vaultEntities);
+        return VaultEntityConverter.fromEntityList(vaultEntities, user);
     }
 }

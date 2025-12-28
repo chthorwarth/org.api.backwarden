@@ -9,8 +9,10 @@ import org.backwarden.api.adapters.database.model.UserEntity;
 import org.backwarden.api.adapters.database.model.VaultEntity;
 import org.backwarden.api.adapters.database.model.converter.CredentialEntityConverter;
 import org.backwarden.api.adapters.database.model.converter.UserEntityConverter;
+import org.backwarden.api.adapters.database.model.converter.VaultEntityConverter;
 import org.backwarden.api.logic.exceptions.EmailAlreadyExistsException;
 import org.backwarden.api.logic.model.User;
+import org.backwarden.api.logic.model.Vault;
 import org.backwarden.api.logic.ports.output.persistence.UserRepository;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -38,6 +40,7 @@ public class UserAdapter implements UserRepository
     public User getUser(long id)
     {
         UserEntity userEntity = entityManager.find(UserEntity.class, id);
+
         return UserEntityConverter.fromEntity(userEntity);
     }
 

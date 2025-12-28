@@ -42,7 +42,6 @@ public class CredentialController implements CredentialsApi {
 
     @Override
     public Response vaultsVaultIdCredentialsGet(Integer vaultId) {
-        System.out.println("Test\n\n\n\n");
         CredentialWrapperDTO wrapperDTO = new CredentialWrapperDTO();
 
         List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId));
@@ -62,7 +61,7 @@ public class CredentialController implements CredentialsApi {
     @Override
     public Response vaultsVaultIdCredentialsPost(Integer vaultId, CredentialDTO credentialDTO)
     {
-        credentialService.createCredentials(CredentialDTOConverter.fromDTO(credentialDTO));
+        credentialService.createCredentials(CredentialDTOConverter.fromDTO(credentialDTO), vaultId);
         return Response.ok().build();
     }
 

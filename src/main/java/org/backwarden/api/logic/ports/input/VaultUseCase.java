@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface VaultUseCase
 {
-    public void createVault(Vault vault);
+    public void createVault(long userId, Vault vault);
 
     //public Vault getVault(long id);
 
@@ -14,6 +14,6 @@ public interface VaultUseCase
 
     public void deleteVault(long id);
 
-    public List<Vault> getAllVaults();
+    public List<Vault> getAllVaults(long userId);
 
 }

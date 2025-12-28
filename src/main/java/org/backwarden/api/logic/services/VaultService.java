@@ -15,9 +15,9 @@ public class VaultService implements VaultUseCase
     VaultRepository vaultAdapter;
 
     @Override
-    public void createVault(Vault vault)
+    public void createVault(long userId, Vault vault)
     {
-        vaultAdapter.saveVault(vault);
+        vaultAdapter.saveVault(userId, vault);
     }
 
     /*@Override
@@ -39,8 +39,8 @@ public class VaultService implements VaultUseCase
     }
 
     @Override
-    public List<Vault> getAllVaults()
+    public List<Vault> getAllVaults(long userId)
     {
-        return vaultAdapter.getAllVaults();
+        return vaultAdapter.getAllVaults(userId);
     }
 }

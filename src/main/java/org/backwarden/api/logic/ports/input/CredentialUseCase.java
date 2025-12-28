@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CredentialUseCase
 {
-	public void createCredentials(Credential credential);
+	public void createCredentials(Credential credential, long vaultId);
 
 	public Credential getCredential(long id);
 

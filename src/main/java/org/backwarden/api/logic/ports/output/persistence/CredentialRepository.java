@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CredentialRepository
 {
-	public void saveCredential(Credential credential);
+	public void saveCredential(Credential credential, long vaultId);
 
 	public Credential getCredential(long id);
 

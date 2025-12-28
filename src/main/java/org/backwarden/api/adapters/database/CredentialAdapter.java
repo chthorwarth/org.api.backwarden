@@ -7,7 +7,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.backwarden.api.adapters.database.model.VaultEntity;
 import org.backwarden.api.adapters.database.model.converter.CredentialEntityConverter;
+import org.backwarden.api.adapters.database.model.converter.UserEntityConverter;
+import org.backwarden.api.adapters.database.model.converter.VaultEntityConverter;
 import org.backwarden.api.logic.model.Credential;
+import org.backwarden.api.logic.model.User;
+import org.backwarden.api.logic.model.Vault;
 import org.backwarden.api.logic.ports.output.persistence.CredentialRepository;
 
 import java.util.List;
@@ -20,16 +24,26 @@ public class CredentialAdapter implements CredentialRepository {
 
     @Transactional
     @Override
-    public void saveCredential(Credential credential)
+    public void saveCredential(Credential credential, long vaultId)
     {
-        entityManager.persist(CredentialEntityConverter.toEntity(credential));
+        VaultEntity vaultEntity = entityManager.find(VaultEntity.class, vaultId);
+        if (vaultEntity == null)
+        {
+            throw new NotFoundException("Vault not found: " + vaultId);
+        }
+        CredentialEntity credentialEntity = CredentialEntityConverter.toEntity(credential);
+        credentialEntity.setVault(vaultEntity);
+
+        entityManager.persist(credentialEntity);
     }
 
     public Credential getCredential(long id)
     {
         CredentialEntity credentialEntity = entityManager.find(CredentialEntity.class, id);
+        User user = UserEntityConverter.fromEntity(credentialEntity.getVault().getUser());
+        Vault vault = VaultEntityConverter.fromEntity(credentialEntity.getVault(), user);
 
-        return CredentialEntityConverter.fromEntity(credentialEntity);
+        return CredentialEntityConverter.fromEntity(credentialEntity, vault);
     }
 
 
@@ -44,11 +58,12 @@ public class CredentialAdapter implements CredentialRepository {
             throw new NotFoundException("Vault not found: " + vaultId);
         }
 
-        List<CredentialEntity> credentialEntities = entityManager.createQuery("SELECT c FROM CredentialEntity c WHERE c.vault = :vaultEntity", CredentialEntity.class)
-                .setParameter("vaultEntity",vaultEntity)
+        List<CredentialEntity> credentialEntities = entityManager.createQuery("SELECT c FROM CredentialEntity c WHERE c.vault.id = :vaultId", CredentialEntity.class)
+                .setParameter("vaultId",vaultEntity.getId())
                 .getResultList();
-        git commit -m "added Credential functionality. We still have some issues about converter classes we have to discuss about."
-        return CredentialEntityConverter.fromEntityList(credentialEntities);
+        User user = UserEntityConverter.fromEntity(vaultEntity.getUser());
+
+        return CredentialEntityConverter.fromEntityList(credentialEntities, VaultEntityConverter.fromEntity(vaultEntity, user));
     }
 
     @Override
