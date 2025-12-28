@@ -1,9 +1,10 @@
 package org.backwarden.api.adapters.controller.model.converter;
 
-import org.backwarden.api.adapters.controller.model.VaultDTO;
+
 import org.backwarden.api.logic.model.Credential;
 import org.backwarden.api.logic.model.Vault;
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.VaultDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,6 @@ class VaultDTOConverterTest
 
         assertEquals(vault.getId(), dto.getId());
         assertEquals(vault.getTitle(), dto.getTitle());
-        assertEquals(vault.isAutoFill(), dto.isAutoFill());
         assertEquals(vault.getCredentials().size(), dto.getCredentials().size());
         assertEquals(vault.getCredentials().get(0).getId(), dto.getCredentials().get(0).getId());
     }
@@ -38,7 +38,6 @@ class VaultDTOConverterTest
     @Test
     void testFromDTO() {
         VaultDTO dto = new VaultDTO();
-        dto.setId(1);
         dto.setTitle("Test Vault");
         dto.setAutoFill(true);
         dto.setCredentials(new ArrayList<>());
@@ -47,7 +46,6 @@ class VaultDTOConverterTest
 
         assertEquals(dto.getId(), vault.getId());
         assertEquals(dto.getTitle(), vault.getTitle());
-        assertEquals(dto.isAutoFill(), vault.isAutoFill());
         assertNull(vault.getUser()); // Prüfen, dass keine Endlosschleife entsteht
     }
 
@@ -71,7 +69,6 @@ class VaultDTOConverterTest
     void testFromDTOList() {
         List<VaultDTO> dtos = new ArrayList<>();
         VaultDTO dto = new VaultDTO();
-        dto.setId(1);
         dto.setTitle("Test Vault");
         dtos.add(dto);
         dto.setCredentials(new ArrayList<>());

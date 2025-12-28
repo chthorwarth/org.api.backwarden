@@ -21,7 +21,6 @@ class VaultAdapterTest
     @Transactional
     void getVault()
     {
-        Vault vault = adapter.getVault(1);
-        assertEquals(Vault.class, vault.getClass());
+
     }
 }

@@ -1,7 +1,8 @@
 package org.backwarden.api.adapters.controller.model.converter;
 
-import org.backwarden.api.adapters.controller.model.VaultDTO;
+
 import org.backwarden.api.logic.model.Vault;
+import org.openapitools.model.VaultDTO;
 
 import java.util.List;
 
@@ -16,11 +17,9 @@ public class VaultDTOConverter {
     }
     public static Vault fromDTO(VaultDTO vaultDTO) {
         Vault vault = new Vault();
-        vault.setId(vaultDTO.getId());
         vault.setTitle(vaultDTO.getTitle());
         vault.setUser(null);        //results in endless loop
         vault.setCredentials(CredentialDTOConverter.fromDTOList(vaultDTO.getCredentials()));
-        vault.setAutoFill(vaultDTO.isAutoFill());
         return vault;
     }
     public static List<VaultDTO> toDTOList(List<Vault> vaults) {
