@@ -2,6 +2,7 @@ package org.backwarden.api.adapters.controller.model.converter;
 
 import org.openapitools.model.UserDTO;
 import org.backwarden.api.logic.model.User;
+import org.openapitools.model.UserRegistrationDTO;
 
 import java.util.Collections;
 
@@ -21,6 +22,13 @@ public class UserDTOConverter {
         user.setMasterEmail(userDTO.getMasterEmail());
         user.setMasterPassword(userDTO.getMasterPassword());
         user.setFailedLoginAttempts(userDTO.getFailedLoginAttempts());
+        return user;
+    }
+
+    public static User fromDTO(UserRegistrationDTO userRegistrationDTO) {
+        User user = new User();
+        user.setMasterEmail(userRegistrationDTO.getMasterEmail());
+        user.setMasterPassword(userRegistrationDTO.getMasterPassword());
         return user;
     }
 }

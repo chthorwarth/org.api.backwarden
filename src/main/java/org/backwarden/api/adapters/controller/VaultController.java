@@ -4,7 +4,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
 import org.openapitools.api.VaultsApi;
+import org.openapitools.model.VaultCreationDTO;
 import org.openapitools.model.VaultDTO;
+import org.openapitools.model.VaultUpdateDTO;
 import org.openapitools.model.VaultWrapperDTO;
 
 import java.net.URI;
@@ -29,8 +31,7 @@ public class VaultController implements VaultsApi {
     }
 
     @Override
-    public Response usersUserIdVaultsPost(Integer userId, VaultDTO vaultDTO) {
-        System.out.println(vaultDTO.getTitle());
+    public Response usersUserIdVaultsPost(Integer userId, VaultCreationDTO vaultCreationDTO) {
         return Response.ok().build();
     }
 
@@ -41,7 +42,8 @@ public class VaultController implements VaultsApi {
     }
 
     @Override
-    public Response usersUserIdVaultsVaultIdPut(Integer userId, Integer vaultId, VaultDTO vaultDTO) {
+    public Response usersUserIdVaultsVaultIdPut(Integer userId, Integer vaultId, VaultUpdateDTO vaultUpdateDTO) {
+        VaultDTO vaultDTO = new VaultDTO();
         vaultDTO.setSelfLink(URI.create("/users/" + userId + "/vaults/" + vaultId));
         return Response.ok(vaultDTO).build();
     }

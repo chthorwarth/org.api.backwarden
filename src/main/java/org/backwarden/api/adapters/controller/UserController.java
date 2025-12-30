@@ -11,26 +11,23 @@ import org.backwarden.api.logic.exceptions.EmailAlreadyExistsException;
 import org.backwarden.api.logic.ports.input.UserUseCase;
 import org.openapitools.api.UsersApi;
 import org.openapitools.model.UserDTO;
+import org.openapitools.model.UserRegistrationDTO;
 
 @ApplicationScoped
-public class UserController implements UsersApi
-{
+public class UserController implements UsersApi {
     @Inject
     UserUseCase userService;
 
     @Override
-    public Response usersPost(@Valid @NotNull UserDTO userDTO)
-    {
+    public Response usersPost(@Valid @NotNull UserRegistrationDTO userRegistrationDTO) {
         try {
-            userService.createUser(UserDTOConverter.fromDTO(userDTO));
+            userService.createUser(UserDTOConverter.fromDTO(userRegistrationDTO));
             return Response.status(Response.Status.CREATED).build();
         } catch (DomainValidationException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())
                     .build();
-        }
-        catch (EmailAlreadyExistsException e)
-        {
+        } catch (EmailAlreadyExistsException e) {
             return Response.status(Response.Status.CONFLICT)
                     .entity(e.getMessage())
                     .build();
@@ -38,8 +35,7 @@ public class UserController implements UsersApi
     }
 
     @Override
-    public Response usersUserIdGet(Integer userId)
-    {
+    public Response usersUserIdGet(Integer userId) {
         UserDTO dto = UserDTOConverter.toDTO(userService.getUser(userId));
 
         return Response.ok(dto).build();

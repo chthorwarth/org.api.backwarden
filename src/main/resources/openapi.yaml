@@ -23,7 +23,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserDTO'
+              $ref: '#/components/schemas/UserRegistrationDTO'
       responses:
         '201':
           description: Created
@@ -80,7 +80,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VaultDTO'
+              $ref: '#/components/schemas/VaultCreationDTO'
       responses:
         '201':
           description: Created
@@ -108,7 +108,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VaultDTO'
+              $ref: '#/components/schemas/VaultUpdateDTO'
       responses:
         '200':
           description: Updated
@@ -156,7 +156,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CredentialDTO'
+              $ref: '#/components/schemas/CredentialCreationDTO'
       responses:
         '201':
           description: Created
@@ -197,7 +197,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CredentialDTO'
+              $ref: '#/components/schemas/CredentialUpdateDTO'
       responses:
         '200':
           description: Updated
@@ -239,6 +239,18 @@ components:
         - masterEmail
         - masterPassword
 
+    UserRegistrationDTO:
+      type: object
+      description: DTO used only when creating a new user
+      properties:
+        masterEmail:
+          type: string
+        masterPassword:
+          type: string
+      required:
+        - masterEmail
+        - masterPassword
+
     VaultDTO:
       type: object
       properties:
@@ -249,10 +261,6 @@ components:
           type: string
         autoFill:
           type: boolean
-        credentials:
-          type: array
-          items:
-            $ref: '#/components/schemas/CredentialDTO'
         selfLink:
           type: string
           format: uri
@@ -260,6 +268,96 @@ components:
       required:
         - title
         - autoFill
+
+    VaultCreationDTO:
+      type: object
+      description: DTO used only when creating a new vault
+      properties:
+        title:
+          type: string
+        autoFill:
+          type: boolean
+      required:
+        - title
+        - autoFill
+
+    VaultUpdateDTO:
+      type: object
+      description: DTO used only when updating a vault
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        autoFill:
+          type: boolean
+      required:
+        - id
+        - title
+        - autoFill
+
+    CredentialDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        selfLink:
+          type: string
+          format: uri
+          readOnly: true
+        title:
+          type: string
+        username:
+          type: string
+        passwordCiphertext:
+          type: string
+        passwordIV:
+          type: string
+        note:
+          type: string
+      required:
+        - title
+        - username
+
+    CredentialCreationDTO:
+      type: object
+      description: DTO used only when creating a new credential
+      properties:
+        title:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        note:
+          type: string
+      required:
+        - title
+        - username
+        - password
+
+    CredentialUpdateDTO:
+      type: object
+      description: DTO used only when updating a credential
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        note:
+          type: string
+      required:
+        - id
+        - title
+        - username
+        - password
 
     VaultWrapperDTO:
       type: object
@@ -282,31 +380,3 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CredentialDTO'
-
-    CredentialDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        selfLink:
-          type: string
-          format: uri
-          readOnly: true
-        title:
-          type: string
-        isPasswordSecure:
-          type: boolean
-        username:
-          type: string
-        password:
-          type: string
-        passwordCiphertext:
-          type: string
-        passwordIV:
-          type: string
-        note:
-          type: string
-      required:
-        - title
-        - username

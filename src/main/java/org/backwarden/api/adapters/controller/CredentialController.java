@@ -6,9 +6,10 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 
 
-
 import org.openapitools.api.CredentialsApi;
+import org.openapitools.model.CredentialCreationDTO;
 import org.openapitools.model.CredentialDTO;
+import org.openapitools.model.CredentialUpdateDTO;
 import org.openapitools.model.CredentialWrapperDTO;
 
 import java.net.URI;
@@ -34,9 +35,9 @@ public class CredentialController implements CredentialsApi {
     }
 
     @Override
-    public Response vaultsVaultIdCredentialsCredentialIdPut(Integer vaultId, Integer credentialId, CredentialDTO credentialDTO) {
-        credentialDTO.id(1L);
-        credentialDTO.setTitle("CredentialVault");
+    public Response vaultsVaultIdCredentialsCredentialIdPut(Integer vaultId, Integer credentialId, CredentialUpdateDTO credentialUpdateDTO) {
+        credentialUpdateDTO.id(1L);
+        credentialUpdateDTO.setTitle("CredentialVault");
         return Response.ok().build();
     }
 
@@ -59,8 +60,8 @@ public class CredentialController implements CredentialsApi {
     }
 
     @Override
-    public Response vaultsVaultIdCredentialsPost(Integer vaultId, org.openapitools.model.CredentialDTO credentialDTO) {
-        System.out.printf(credentialDTO.getTitle());
+    public Response vaultsVaultIdCredentialsPost(Integer vaultId, CredentialCreationDTO credentialCreationDTO) {
+        System.out.printf(credentialCreationDTO.getTitle());
         return Response.ok().build();
     }
 
