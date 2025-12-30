@@ -228,8 +228,6 @@ components:
           format: int64
         masterEmail:
           type: string
-        masterPassword:
-          type: string
         failedLoginAttempts:
           type: integer
         lockedUntil:
@@ -237,7 +235,6 @@ components:
           format: date-time
       required:
         - masterEmail
-        - masterPassword
 
     UserRegistrationDTO:
       type: object

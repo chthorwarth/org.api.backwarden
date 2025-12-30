@@ -5,6 +5,7 @@ import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.model.Vault;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.UserDTO;
+import org.openapitools.model.UserRegistrationDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +39,8 @@ class UserDTOConverterTest {
 
     @Test
     void testFromDTO() {
-        UserDTO dto = new UserDTO();
+        UserRegistrationDTO dto = new UserRegistrationDTO();
         dto.setMasterEmail("test@test.de");
-        dto.setFailedLoginAttempts(0);
         dto.setMasterPassword("testpass");
 
         List<VaultDTO> vaults = new ArrayList<>();
@@ -54,8 +54,6 @@ class UserDTOConverterTest {
         User user = UserDTOConverter.fromDTO(dto);
 
         assertEquals(dto.getMasterEmail(), user.getMasterEmail());
-        assertEquals(dto.getFailedLoginAttempts(), user.getFailedLoginAttempts());
-        assertEquals(dto.getLockedUntil(), user.getLockedUntil());
         assertEquals(dto.getMasterPassword(), user.getMasterPassword());
     }
 

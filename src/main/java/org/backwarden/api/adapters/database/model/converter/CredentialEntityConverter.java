@@ -2,8 +2,10 @@ package org.backwarden.api.adapters.database.model.converter;
 
 import org.backwarden.api.adapters.database.model.CredentialEntity;
 import org.backwarden.api.logic.model.Credential;
+import org.backwarden.api.logic.model.Vault;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class CredentialEntityConverter
 {
@@ -22,7 +24,7 @@ public class CredentialEntityConverter
         return credentialEntity;
     }
 
-    public static Credential fromEntity(CredentialEntity credentialEntity)
+    public static Credential fromEntity(CredentialEntity credentialEntity, Vault vault)
     {
         Credential credential = new Credential();
 
@@ -34,7 +36,7 @@ public class CredentialEntityConverter
         credential.setPasswordCiphertext(credentialEntity.getPasswordCiphertext());
         //credential.setPasswordSecure(credentialEntity.isPasswordSecure());
 
-        credential.setVault(null); //mapping results in endless loop
+        credential.setVault(vault); //mapping results in endless loop
 
         return credential;
     }
@@ -46,10 +48,16 @@ public class CredentialEntityConverter
                 .toList();
     }
 
-    public static List<Credential> fromEntityList(List<CredentialEntity> credentialEntities)
+    public static List<Credential> fromEntityList(List<CredentialEntity> credentialEntities, Vault vault)
     {
         return credentialEntities.stream()
-                .map(CredentialEntityConverter::fromEntity)
+                .map(new Function<CredentialEntity, Credential>() {
+                    @Override
+                    public Credential apply(CredentialEntity credentialEntity)
+                    {
+                        return fromEntity(credentialEntity, vault);
+                    }
+                })
                 .toList();
     }
 }

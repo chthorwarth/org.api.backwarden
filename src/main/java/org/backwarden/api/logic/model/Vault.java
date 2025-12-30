@@ -1,12 +1,13 @@
 package org.backwarden.api.logic.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Vault {
     private long id;
     private String title;
     private User user;
-    private List<Credential> credentials;
+    private List<Credential> credentials = new ArrayList<>();
     private boolean autoFill;
 
     public long getId() {

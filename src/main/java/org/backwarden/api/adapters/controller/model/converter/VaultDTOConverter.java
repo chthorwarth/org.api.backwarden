@@ -1,7 +1,10 @@
 package org.backwarden.api.adapters.controller.model.converter;
 
-import org.backwarden.api.adapters.controller.model.VaultDTO;
+
 import org.backwarden.api.logic.model.Vault;
+import org.openapitools.model.VaultCreationDTO;
+import org.openapitools.model.VaultDTO;
+import org.openapitools.model.VaultUpdateDTO;
 
 import java.util.List;
 
@@ -10,28 +13,28 @@ public class VaultDTOConverter {
         VaultDTO vaultDTO = new VaultDTO();
         vaultDTO.setId(vault.getId());
         vaultDTO.setTitle(vault.getTitle());
-        vaultDTO.setCredentials(CredentialDTOConverter.toDTOList(vault.getCredentials()));
         vaultDTO.setAutoFill(vault.isAutoFill());
         return vaultDTO;
     }
-    public static Vault fromDTO(VaultDTO vaultDTO) {
+
+    public static Vault fromDTO(VaultCreationDTO vaultCreationDTO) {
         Vault vault = new Vault();
-        vault.setId(vaultDTO.getId());
-        vault.setTitle(vaultDTO.getTitle());
-        vault.setUser(null);        //results in endless loop
-        vault.setCredentials(CredentialDTOConverter.fromDTOList(vaultDTO.getCredentials()));
-        vault.setAutoFill(vaultDTO.isAutoFill());
+        vault.setTitle(vaultCreationDTO.getTitle());
+        vault.setAutoFill(vaultCreationDTO.getAutoFill());
         return vault;
     }
+
+    public static Vault fromDTO(VaultUpdateDTO vaultUpdateDTO) {
+        Vault vault = new Vault();
+        vault.setId(vaultUpdateDTO.getId());
+        vault.setTitle(vaultUpdateDTO.getTitle());
+        vault.setAutoFill(vaultUpdateDTO.getAutoFill());
+        return vault;
+    }
+
     public static List<VaultDTO> toDTOList(List<Vault> vaults) {
         return vaults.stream()
                 .map(VaultDTOConverter::toDTO)
-                .toList();
-    }
-
-    public static List<Vault> fromDTOList(List<VaultDTO> vaultDTOs) {
-        return vaultDTOs.stream()
-                .map(VaultDTOConverter::fromDTO)
                 .toList();
     }
 }

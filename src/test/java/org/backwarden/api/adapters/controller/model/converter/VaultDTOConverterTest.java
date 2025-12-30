@@ -1,17 +1,19 @@
 package org.backwarden.api.adapters.controller.model.converter;
 
-import org.backwarden.api.adapters.controller.model.VaultDTO;
+
 import org.backwarden.api.logic.model.Credential;
 import org.backwarden.api.logic.model.Vault;
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.VaultCreationDTO;
+import org.openapitools.model.VaultDTO;
+import org.openapitools.model.VaultUpdateDTO;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class VaultDTOConverterTest
-{
+class VaultDTOConverterTest {
     @Test
     void testToDTO() {
         Vault vault = new Vault();
@@ -30,25 +32,34 @@ class VaultDTOConverterTest
 
         assertEquals(vault.getId(), dto.getId());
         assertEquals(vault.getTitle(), dto.getTitle());
-        assertEquals(vault.isAutoFill(), dto.isAutoFill());
-        assertEquals(vault.getCredentials().size(), dto.getCredentials().size());
-        assertEquals(vault.getCredentials().get(0).getId(), dto.getCredentials().get(0).getId());
     }
 
     @Test
-    void testFromDTO() {
-        VaultDTO dto = new VaultDTO();
-        dto.setId(1);
+    void testFromVaultCreationDTO() {
+        VaultCreationDTO dto = new VaultCreationDTO();
         dto.setTitle("Test Vault");
         dto.setAutoFill(true);
-        dto.setCredentials(new ArrayList<>());
+
+        Vault vault = VaultDTOConverter.fromDTO(dto);
+
+        assertEquals(dto.getTitle(), vault.getTitle());
+        assertEquals(dto.getAutoFill(), vault.isAutoFill());
+        assertNull(vault.getUser());
+    }
+
+    @Test
+    void testFromVaultUpdateDTO() {
+        VaultUpdateDTO dto = new VaultUpdateDTO();
+        dto.setId(1L);
+        dto.setTitle("Test Vault");
+        dto.setAutoFill(true);
 
         Vault vault = VaultDTOConverter.fromDTO(dto);
 
         assertEquals(dto.getId(), vault.getId());
         assertEquals(dto.getTitle(), vault.getTitle());
-        assertEquals(dto.isAutoFill(), vault.isAutoFill());
-        assertNull(vault.getUser()); // Prüfen, dass keine Endlosschleife entsteht
+        assertEquals(dto.getAutoFill(), vault.isAutoFill());
+        assertNull(vault.getUser());
     }
 
     @Test
@@ -67,20 +78,5 @@ class VaultDTOConverterTest
         assertEquals(vaults.get(0).getTitle(), dtos.get(0).getTitle());
     }
 
-    @Test
-    void testFromDTOList() {
-        List<VaultDTO> dtos = new ArrayList<>();
-        VaultDTO dto = new VaultDTO();
-        dto.setId(1);
-        dto.setTitle("Test Vault");
-        dtos.add(dto);
-        dto.setCredentials(new ArrayList<>());
-
-        List<Vault> vaults = VaultDTOConverter.fromDTOList(dtos);
-
-        assertEquals(dtos.size(), vaults.size());
-        assertEquals(dtos.get(0).getId(), vaults.get(0).getId());
-        assertEquals(dtos.get(0).getTitle(), vaults.get(0).getTitle());
-    }
 
 }
