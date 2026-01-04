@@ -4,6 +4,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.backwarden.api.logic.ports.output.persistence.CredentialRepository;
 import org.backwarden.api.logic.ports.output.persistence.UserRepository;
 import org.backwarden.api.logic.ports.output.persistence.VaultRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,9 +22,13 @@ public class BaseControllerTest {
     @Inject
     VaultRepository vaultRepository;
 
+    @Inject
+    CredentialRepository credentialRepository;
+
     @BeforeEach
     @Transactional
     void cleanDB() {
+        credentialRepository.deleteAll();
         vaultRepository.deleteAll();
         userRepository.deleteAll();
     }

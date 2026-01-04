@@ -13,6 +13,7 @@ import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.model.Vault;
 import org.backwarden.api.logic.ports.output.persistence.VaultRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
@@ -71,7 +72,7 @@ public class VaultAdapter implements VaultRepository {
                 .setParameter("userId", userId)
                 .getResultList();
         if (vaultEntities.isEmpty()) {
-            throw new NotFoundException("No vaults found");
+            return new ArrayList<>();
         }
         User user = UserEntityConverter.fromEntity(vaultEntities.get(0).getUser());
 

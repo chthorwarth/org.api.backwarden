@@ -2,6 +2,7 @@ package org.backwarden.api.logic.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.backwarden.api.logic.model.Credential;
 import org.backwarden.api.logic.ports.input.CredentialUseCase;
 import org.backwarden.api.logic.ports.output.persistence.CredentialRepository;
@@ -31,6 +32,7 @@ public class CredentialService implements CredentialUseCase {
     }
 
     @Override
+    @Transactional
     public void deleteCredential(long id) {
         credentialAdapter.deleteCredential(id);
     }

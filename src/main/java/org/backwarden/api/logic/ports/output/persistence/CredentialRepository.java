@@ -15,4 +15,6 @@ public interface CredentialRepository {
     public void deleteCredential(long id);
 
     public void updateCredential(long id, Credential credential);
+
+    public void deleteAll();
 }

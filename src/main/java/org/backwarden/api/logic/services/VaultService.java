@@ -20,12 +20,6 @@ public class VaultService implements VaultUseCase {
         return vault1.getId();
     }
 
-    /*@Override
-    public Vault getVault(long id)
-    {
-        return vaultRepository.getVault(id);
-    }*/
-
     @Override
     public void updateVault(long id, Vault vault) {
         vaultAdapter.updateVault(id, vault);
@@ -43,7 +37,7 @@ public class VaultService implements VaultUseCase {
 
     @Override
     public long getUserIdByVaultId(long vaultId) {
-        return getVault(vaultId).getId();
+        return getVault(vaultId).getUser().getId();
     }
 
     @Override

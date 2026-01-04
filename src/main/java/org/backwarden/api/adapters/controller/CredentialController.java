@@ -64,12 +64,12 @@ public class CredentialController implements CredentialsApi {
                 throw new ForbiddenException("Not your account");
             }
             CredentialDTO credentialDTO = CredentialDTOConverter.toDTO(credentialService.getCredential(credentialId));
-            //credentialDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("credentialid", credentialId).resolveTemplate("vaultid", vaultId).build());
+            credentialDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("credentialid", credentialId).resolveTemplate("vaultid", vaultId).build());
             URI vaultsDelete = uriInfo
                     .getBaseUriBuilder()
                     .path("vaults/{vaultid}/credentials/{credentialid}")
                     .resolveTemplate("vaultid", vaultId)
-                    .resolveTemplate("credentialsid", credentialDTO.getId())
+                    .resolveTemplate("credentialid", credentialDTO.getId())
                     .build();
             return Response.ok(credentialDTO).link(vaultsDelete, "deleteVault").build();
         } catch (NoSuchElementException e) {
@@ -86,13 +86,12 @@ public class CredentialController implements CredentialsApi {
                 throw new ForbiddenException("Not your account");
             }
             CredentialWrapperDTO wrapperDTO = new CredentialWrapperDTO();
-            //wrapperDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials").resolveTemplate("vaultid", vaultId).build());
+            wrapperDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials").resolveTemplate("vaultid", vaultId).build());
 
             List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId));
 
             for (CredentialDTO dto : credentialDTOs)
-                System.out.println("lol");
-            //dto.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("vaultid", vaultId).resolveTemplate("credentialid", dto.getId()).build());
+                dto.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("vaultid", vaultId).resolveTemplate("credentialid", dto.getId()).build());
 
 
             wrapperDTO.credentialDTOS(credentialDTOs);

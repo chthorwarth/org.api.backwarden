@@ -92,4 +92,9 @@ public class CredentialAdapter implements CredentialRepository {
             managedCredential.setNote(credential.getNote());
     }
 
+    @Override
+    public void deleteAll() {
+        entityManager.createQuery("DELETE FROM CredentialEntity").executeUpdate();
+    }
+
 }

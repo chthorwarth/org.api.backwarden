@@ -99,13 +99,18 @@ public class VaultController implements VaultsApi {
         VaultDTO vaultDTO = VaultDTOConverter.toDTO(vaultService.getVault(vaultId));
         vaultDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/users/{userid}/vaults/{vaultid}").resolveTemplate("userid", userId).resolveTemplate("vaultid", vaultDTO.getId()).build());
 
-        URI vaultsDelete = uriInfo
+        URI credentialsGet = uriInfo
+                .getBaseUriBuilder()
+                .path("vaults/{vaultid}/credentials")
+                .resolveTemplate("vaultid", vaultDTO.getId())
+                .build();
+        URI deleteVault = uriInfo
                 .getBaseUriBuilder()
                 .path("users/{userid}/vaults/{vaultid}")
                 .resolveTemplate("userid", currentUserId)
                 .resolveTemplate("vaultid", vaultDTO.getId())
                 .build();
-        return Response.ok(vaultDTO).link(vaultsDelete, "deleteVault").build();
+        return Response.ok(vaultDTO).link(credentialsGet, "getAllCredentials").link(deleteVault, "deleteVault").build();
     }
 
 }
