@@ -5,15 +5,14 @@ import org.backwarden.api.logic.model.Credential;
 
 import java.util.List;
 
-public interface CredentialRepository
-{
-	public void saveCredential(Credential credential, long vaultId);
+public interface CredentialRepository {
+    public Credential saveCredential(Credential credential, long vaultId);
 
-	public Credential getCredential(long id);
+    public Credential getCredential(long id);
 
-	public List<Credential> getAllCredentials(long vaultId);
+    public List<Credential> getAllCredentials(long vaultId);
 
-	public void deleteCredential(long id);
+    public void deleteCredential(long id);
 
-	public void updateCredential(long id, Credential credential);
+    public void updateCredential(long id, Credential credential);
 }

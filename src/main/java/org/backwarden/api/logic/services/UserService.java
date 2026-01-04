@@ -8,12 +8,13 @@ import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.ports.input.UserUseCase;
 import org.backwarden.api.logic.ports.output.persistence.UserRepository;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
+
 import io.quarkus.elytron.security.common.BcryptUtil;
 
 @ApplicationScoped
-public class UserService implements UserUseCase
-{
+public class UserService implements UserUseCase {
     private static final String EMAIL_REGEX = "^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$";
     private static final Pattern PATTERN = Pattern.compile(EMAIL_REGEX);
     private static final String PASSWORD_REGEX = "^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\\w\\d\\s:])([^\\s]){12,30}$";
@@ -24,8 +25,7 @@ public class UserService implements UserUseCase
 
 
     @Override
-    public void createUser(User user)
-    {
+    public long createUser(User user) {
         if (isMailValid(user.getMasterEmail()) && isPasswordValid(user.getMasterPassword(), user.getMasterEmail())) {
             String passwordHash = BcryptUtil.bcryptHash(user.getMasterPassword());
 
@@ -33,30 +33,35 @@ public class UserService implements UserUseCase
 
             user.setMasterPasswordHash(passwordHash); // Speichere NUR den Hash
 
-            userRepository.saveUser(user);
-        }
-        else{
+            return userRepository.saveUser(user);
+        } else {
             throw new DomainValidationException("Invalid email or password");
         }
 
     }
 
     @Override
-    public User getUser(long id)
-    {
+    public User getUser(long id) {
         return userRepository.getUser(id);
     }
 
+    @Override
+    public User authenticate(String mail, String password) {
+        User user = userRepository.getUser(mail);
+        if (mail.equals(user.getMasterEmail()) && BcryptUtil.matches(password, user.getMasterPasswordHash()))
+            return user;
+        return null;
+    }
 
-    boolean isMailValid(String mail)
-    {
+
+    boolean isMailValid(String mail) {
         if (mail == null || mail.isEmpty()) {
             return false;
         }
         return PATTERN.matcher(mail).matches();
     }
-    boolean isPasswordValid(String password, String mail)
-    {
+
+    boolean isPasswordValid(String password, String mail) {
         if (password == null || password.isEmpty() || password.equals(mail)) {
             return false;
         }

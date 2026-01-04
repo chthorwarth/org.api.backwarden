@@ -10,36 +10,33 @@ import java.util.List;
 
 
 @ApplicationScoped
-public class CredentialService implements CredentialUseCase
-{
-	@Inject
-	CredentialRepository credentialAdapter;
+public class CredentialService implements CredentialUseCase {
+    @Inject
+    CredentialRepository credentialAdapter;
 
-	@Override
-	public void createCredentials(Credential credential, long vaultId) {
-		credentialAdapter.saveCredential(credential, vaultId);
-	}
+    @Override
+    public long createCredentials(Credential credential, long vaultId) {
+        Credential credential1 = credentialAdapter.saveCredential(credential, vaultId);
+        return credential1.getId();
+    }
 
-	@Override
-	public Credential getCredential(long id) {
-		return credentialAdapter.getCredential(id);
-	}
+    @Override
+    public Credential getCredential(long id) {
+        return credentialAdapter.getCredential(id);
+    }
 
-	@Override
-	public List<Credential> getAllCredentials(long vaultId)
-	{
-		return credentialAdapter.getAllCredentials(vaultId);
-	}
+    @Override
+    public List<Credential> getAllCredentials(long vaultId) {
+        return credentialAdapter.getAllCredentials(vaultId);
+    }
 
-	@Override
-	public void deleteCredential(long id)
-	{
-		credentialAdapter.deleteCredential(id);
-	}
+    @Override
+    public void deleteCredential(long id) {
+        credentialAdapter.deleteCredential(id);
+    }
 
-	@Override
-	public void updateCredential(long id, Credential credential)
-	{
-		credentialAdapter.updateCredential(id, credential);
-	}
+    @Override
+    public void updateCredential(long id, Credential credential) {
+        credentialAdapter.updateCredential(id, credential);
+    }
 }

@@ -100,18 +100,12 @@ paths:
           type: integer
           format: int32
 
-    put:
+    get:
       tags: [ Vaults ]
-      summary: Update a vault for a user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VaultUpdateDTO'
+      summary: Get a specific vault for a user
       responses:
         '200':
-          description: Updated
+          description: OK
           content:
             application/json:
               schema:
@@ -144,7 +138,7 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            application/json':
               schema:
                 $ref: '#/components/schemas/CredentialWrapperDTO'
 
@@ -182,25 +176,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CredentialDTO'
-        '404':
-          description: Vault or credential not found
-
-    put:
-      tags: [ Credentials ]
-      summary: Update (replace) a specific credential by id in a vault
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CredentialUpdateDTO'
-      responses:
-        '200':
-          description: Updated
           content:
             application/json:
               schema:

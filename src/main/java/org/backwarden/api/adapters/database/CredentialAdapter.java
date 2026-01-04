@@ -1,4 +1,5 @@
 package org.backwarden.api.adapters.database;
+
 import jakarta.ws.rs.NotFoundException;
 import org.backwarden.api.adapters.database.model.CredentialEntity;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -24,21 +25,21 @@ public class CredentialAdapter implements CredentialRepository {
 
     @Transactional
     @Override
-    public void saveCredential(Credential credential, long vaultId)
-    {
+    public Credential saveCredential(Credential credential, long vaultId) {
         VaultEntity vaultEntity = entityManager.find(VaultEntity.class, vaultId);
-        if (vaultEntity == null)
-        {
+        if (vaultEntity == null) {
             throw new NotFoundException("Vault not found: " + vaultId);
         }
         CredentialEntity credentialEntity = CredentialEntityConverter.toEntity(credential);
         credentialEntity.setVault(vaultEntity);
+        User user = UserEntityConverter.fromEntity(credentialEntity.getVault().getUser());
+        Vault vault = VaultEntityConverter.fromEntity(credentialEntity.getVault(), user);
 
         entityManager.persist(credentialEntity);
+        return CredentialEntityConverter.fromEntity(credentialEntity, vault);
     }
 
-    public Credential getCredential(long id)
-    {
+    public Credential getCredential(long id) {
         CredentialEntity credentialEntity = entityManager.find(CredentialEntity.class, id);
         User user = UserEntityConverter.fromEntity(credentialEntity.getVault().getUser());
         Vault vault = VaultEntityConverter.fromEntity(credentialEntity.getVault(), user);
@@ -49,17 +50,15 @@ public class CredentialAdapter implements CredentialRepository {
 
     //currently not working because of converter classes. Maybe we should add only vaultId to the DTO and model classes and save the Vault object in Entity class
     @Override
-    public List<Credential> getAllCredentials(long vaultId)
-    {
+    public List<Credential> getAllCredentials(long vaultId) {
         VaultEntity vaultEntity = entityManager.find(VaultEntity.class, vaultId);
 
-        if (vaultEntity == null)
-        {
+        if (vaultEntity == null) {
             throw new NotFoundException("Vault not found: " + vaultId);
         }
 
         List<CredentialEntity> credentialEntities = entityManager.createQuery("SELECT c FROM CredentialEntity c WHERE c.vault.id = :vaultId", CredentialEntity.class)
-                .setParameter("vaultId",vaultEntity.getId())
+                .setParameter("vaultId", vaultEntity.getId())
                 .getResultList();
         User user = UserEntityConverter.fromEntity(vaultEntity.getUser());
 
@@ -67,22 +66,18 @@ public class CredentialAdapter implements CredentialRepository {
     }
 
     @Override
-    public void deleteCredential(long id)
-    {
+    public void deleteCredential(long id) {
         CredentialEntity credentialEntity = entityManager.find(CredentialEntity.class, id);
-        if (credentialEntity == null)
-        {
+        if (credentialEntity == null) {
             throw new NotFoundException("Credential with id " + id + " not found");
         }
         entityManager.remove(credentialEntity);
     }
 
     @Override
-    public void updateCredential(long id, Credential credential)
-    {
+    public void updateCredential(long id, Credential credential) {
         CredentialEntity managedCredential = entityManager.find(CredentialEntity.class, id);
-        if (managedCredential == null)
-        {
+        if (managedCredential == null) {
             throw new NotFoundException("Vault with id " + id + " not found");
         }
         if (credential.getTitle() != null && !credential.getTitle().isEmpty())
