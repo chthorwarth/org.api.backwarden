@@ -25,8 +25,7 @@ class CredentialDTOConverterTest {
         assertEquals(credential.getId(), dto.getId());
         assertEquals(credential.getTitle(), dto.getTitle());
         assertEquals(credential.getUsername(), dto.getUsername());
-        assertEquals(credential.getPasswordCiphertext(), dto.getPasswordCiphertext());
-        assertEquals(credential.getPasswordIV(), dto.getPasswordIV());
+        assertEquals(credential.getPassword(), dto.getPassword());
     }
 
     @Test

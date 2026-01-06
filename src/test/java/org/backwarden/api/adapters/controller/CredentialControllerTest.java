@@ -5,6 +5,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.CredentialCreationDTO;
+import org.openapitools.model.CredentialDTO;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -12,12 +13,15 @@ import static org.hamcrest.Matchers.*;
 @QuarkusTest
 public class CredentialControllerTest extends BaseControllerTest {
 
-    private long createCredential(String token, long vaultId) {
-
+    CredentialCreationDTO getCredentialDTO() {
         CredentialCreationDTO dto = new CredentialCreationDTO();
         dto.setTitle("My Login");
         dto.setUsername("user");
         dto.setPassword("secret");
+        return dto;
+    }
+
+    private long createCredential(String token, long vaultId, CredentialCreationDTO dto) {
 
         String location =
                 given()
@@ -46,7 +50,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         String token = token("me@test.de", "Strong#12345");
 
         long vaultId = createVault(token, userId);
-        long credentialId = createCredential(token, vaultId);
+        long credentialId = createCredential(token, vaultId, getCredentialDTO());
 
         given()
                 .auth().oauth2(token)
@@ -55,6 +59,7 @@ public class CredentialControllerTest extends BaseControllerTest {
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
+                .body("credentialDTOS[0].password", containsString(getCredentialDTO().getPassword()))
                 .body("credentialDTOS", notNullValue())
                 .body("credentialDTOS[0].selfLink",
                         containsString("/vaults/" + vaultId + "/credentials/" + credentialId))
@@ -148,7 +153,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         long userId = register("me@test.de", "Strong#12345");
         String token = token("me@test.de", "Strong#12345");
         long vaultId = createVault(token, userId);
-        long credId = createCredential(token, vaultId);
+        long credId = createCredential(token, vaultId, getCredentialDTO());
 
         given()
                 .auth().oauth2(token)
@@ -156,6 +161,7 @@ public class CredentialControllerTest extends BaseControllerTest {
                 .get("/vaults/" + vaultId + "/credentials/" + credId)
                 .then()
                 .statusCode(200)
+                .body(containsString(getCredentialDTO().getPassword()))
                 .body("selfLink",
                         containsString("/vaults/" + vaultId + "/credentials/" + credId))
                 .header("Link", containsString("rel=\"deleteVault\""));
@@ -167,7 +173,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         long u1 = register("a@test.de", "Strong#12345");
         String t1 = token("a@test.de", "Strong#12345");
         long vaultId = createVault(t1, u1);
-        long credId = createCredential(t1, vaultId);
+        long credId = createCredential(t1, vaultId, getCredentialDTO());
 
         long u2 = register("b@test.de", "Strong#12345");
         String t2 = token("b@test.de", "Strong#12345");
@@ -191,7 +197,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         long userId = register("me@test.de", "Strong#12345");
         String token = token("me@test.de", "Strong#12345");
         long vaultId = createVault(token, userId);
-        long credId = createCredential(token, vaultId);
+        long credId = createCredential(token, vaultId, getCredentialDTO());
 
         given()
                 .auth().oauth2(token)
@@ -209,7 +215,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         long u1 = register("a@test.de", "Strong#12345");
         String t1 = token("a@test.de", "Strong#12345");
         long vaultId = createVault(t1, u1);
-        long credId = createCredential(t1, vaultId);
+        long credId = createCredential(t1, vaultId, getCredentialDTO());
 
         long u2 = register("b@test.de", "Strong#12345");
         String t2 = token("b@test.de", "Strong#12345");

@@ -317,9 +317,7 @@ components:
           type: string
         username:
           type: string
-        passwordCiphertext:
-          type: string
-        passwordIV:
+        password:
           type: string
         note:
           type: string

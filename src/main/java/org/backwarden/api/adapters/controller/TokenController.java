@@ -9,11 +9,14 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.backwarden.api.adapters.controller.model.LoginRequest;
 import org.backwarden.api.logic.JwtKeyGenerator;
+import org.backwarden.api.logic.exceptions.DomainValidationException;
 import org.backwarden.api.logic.exceptions.UserDoesNotExistException;
 import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.ports.input.UserUseCase;
 
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.Duration;
 import java.util.Set;
 
@@ -34,11 +37,15 @@ public class TokenController {
         if (request == null || request.email == null || request.password == null) {
             throw new BadRequestException("email + password required");
         }
-        User user = null;
+        User user;
+        String token;
         try {
             user = userService.authenticate(request.email, request.password);
+            token = userService.generateJWTandKDF(user, request.password);
         } catch (UserDoesNotExistException e) {
             throw new NotAuthorizedException("Invalid credentials");
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException();
         }
         if (user == null) {
             throw new NotAuthorizedException("Invalid credentials");
@@ -48,13 +55,6 @@ public class TokenController {
                 .path("users/{userid}/vaults")
                 .resolveTemplate("userid", user.getId())
                 .build();
-
-        String token = Jwt.issuer("http://org.backwarden.api")
-                //.upn(user.getMasterEmail())
-                .subject(String.valueOf(user.getId()))
-                .groups(Set.of("user"))
-                .expiresIn(Duration.ofHours(2))
-                .sign(JwtKeyGenerator.PRIVATE_KEY);
         return Response.created(null).link(vaults, "getAllVaults").entity(token).build();
     }
 }
