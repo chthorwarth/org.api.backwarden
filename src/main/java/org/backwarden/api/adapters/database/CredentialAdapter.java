@@ -24,7 +24,7 @@ public class CredentialAdapter implements CredentialRepository {
 
     @Transactional
     @Override
-    public void saveCredential(Credential credential, long vaultId)
+    public Credential saveCredential(Credential credential, long vaultId)
     {
         VaultEntity vaultEntity = entityManager.find(VaultEntity.class, vaultId);
         if (vaultEntity == null)
@@ -35,11 +35,14 @@ public class CredentialAdapter implements CredentialRepository {
         credentialEntity.setVault(vaultEntity);
 
         entityManager.persist(credentialEntity);
+        return CredentialEntityConverter.fromEntity(credentialEntity, VaultEntityConverter.fromEntity(vaultEntity, UserEntityConverter.fromEntity(vaultEntity.getUser())));
     }
 
     public Credential getCredential(long id)
     {
         CredentialEntity credentialEntity = entityManager.find(CredentialEntity.class, id);
+        if (credentialEntity == null)
+            throw new NotFoundException("Credential not found: " + id);
         User user = UserEntityConverter.fromEntity(credentialEntity.getVault().getUser());
         Vault vault = VaultEntityConverter.fromEntity(credentialEntity.getVault(), user);
 

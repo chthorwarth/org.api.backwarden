@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface VaultRepository
 {
-    public void saveVault(long userId, Vault vault);
+    public Vault saveVault(long userId, Vault vault);
 
     //public Vault getVault(long id);
 

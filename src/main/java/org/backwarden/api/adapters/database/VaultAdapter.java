@@ -23,13 +23,16 @@ public class VaultAdapter implements VaultRepository
 
     @Transactional
     @Override
-    public void saveVault(long userId, Vault vault)
+    public Vault saveVault(long userId, Vault vault)
     {
         UserEntity userEntity = entityManager.find(UserEntity.class, userId);
+        if (userEntity == null)
+            throw new NotFoundException("User with id " + userId + " not found");
         VaultEntity vaultEntity = VaultEntityConverter.toEntity(vault);
         vaultEntity.setUser(userEntity);
 
         entityManager.persist(vaultEntity);
+        return VaultEntityConverter.fromEntity(vaultEntity, UserEntityConverter.fromEntity(userEntity));
     }
 
     /*public Vault getVault(long id)
