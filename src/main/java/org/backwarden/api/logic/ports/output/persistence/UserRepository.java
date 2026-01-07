@@ -11,4 +11,8 @@ public interface UserRepository
 
     public User getUser(long id);
 
+    public User getUser(String mail);
+
+    public void deleteAll();
+
 }

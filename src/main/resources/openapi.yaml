@@ -14,6 +14,40 @@ tags:
 
 paths:
 
+  /api:
+    get:
+      tags: [ Root ]
+      summary: API entry point providing HATEOAS navigation links
+      description: >
+        Entry-point der API. Liefert Link-Header und/oder JSON-Links
+        zu den wichtigsten Navigationsressourcen.
+      responses:
+        '200':
+          description: OK
+          headers:
+            Link:
+              description: >
+                RFC-8288 compatible hypermedia links.
+                Expected rels:
+                  - registerUser  → POST /users
+                  - loginUser     → POST /token
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _links:
+                    type: object
+                    properties:
+                      registerUser:
+                        type: string
+                        format: uri
+                      loginUser:
+                        type: string
+                        format: uri
+
   /users:
     post:
       tags: [ Users ]
@@ -100,18 +134,12 @@ paths:
           type: integer
           format: int32
 
-    put:
+    get:
       tags: [ Vaults ]
-      summary: Update a vault for a user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VaultUpdateDTO'
+      summary: Get a specific vault for a user
       responses:
         '200':
-          description: Updated
+          description: OK
           content:
             application/json:
               schema:
@@ -182,25 +210,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CredentialDTO'
-        '404':
-          description: Vault or credential not found
-
-    put:
-      tags: [ Credentials ]
-      summary: Update (replace) a specific credential by id in a vault
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CredentialUpdateDTO'
-      responses:
-        '200':
-          description: Updated
           content:
             application/json:
               schema:
@@ -308,9 +317,7 @@ components:
           type: string
         username:
           type: string
-        passwordCiphertext:
-          type: string
-        passwordIV:
+        password:
           type: string
         note:
           type: string

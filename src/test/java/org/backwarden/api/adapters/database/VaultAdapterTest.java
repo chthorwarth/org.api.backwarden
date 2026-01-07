@@ -204,7 +204,7 @@ class VaultAdapterTest
 
     @Test
     @Transactional
-    void getAllVaults_shouldThrowNotFoundException_whenNoVaultsExist() {
+    void getAllVaults_shouldBeEmpty_whenNoVaultsExist() {
         User user = createTestUser("empty@test.com");
         userAdapter.saveUser(user);
         entityManager.flush();
@@ -214,10 +214,7 @@ class VaultAdapterTest
                 .setParameter("email", "empty@test.com")
                 .getSingleResult();
 
-        Assertions.assertThrows(
-                NotFoundException.class,
-                () -> vaultAdapter.getAllVaults(userId)
-        );
+        Assertions.assertTrue(vaultAdapter.getAllVaults(userId).isEmpty());
     }
 
 

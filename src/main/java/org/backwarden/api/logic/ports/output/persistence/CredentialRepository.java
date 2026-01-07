@@ -9,11 +9,14 @@ public interface CredentialRepository
 {
 	public Credential saveCredential(Credential credential, long vaultId);
 
-	public Credential getCredential(long id);
 
-	public List<Credential> getAllCredentials(long vaultId);
+    public Credential getCredential(long id);
 
-	public void deleteCredential(long id);
+    public List<Credential> getAllCredentials(long vaultId);
 
-	public void updateCredential(long id, Credential credential);
+    public void deleteCredential(long id);
+
+    public void updateCredential(long id, Credential credential);
+
+    public void deleteAll();
 }

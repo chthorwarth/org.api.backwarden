@@ -152,6 +152,11 @@
             <artifactId>quarkus-elytron-security-common</artifactId>
             <version>3.30.1</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-jwt</artifactId>
+            <version>3.30.1</version>
+        </dependency>
     </dependencies>
 
 

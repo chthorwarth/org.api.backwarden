@@ -16,4 +16,8 @@ public interface VaultRepository
     public void deleteVault(long id);
 
     public List<Vault> getAllVaults(long userId);
+
+    public Vault getVault(long vaultId);
+
+    public void deleteAll();
 }

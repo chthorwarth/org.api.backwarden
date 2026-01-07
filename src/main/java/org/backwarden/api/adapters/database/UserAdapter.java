@@ -1,4 +1,5 @@
 package org.backwarden.api.adapters.database;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -20,8 +21,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import java.util.List;
 
 @ApplicationScoped
-public class UserAdapter implements UserRepository
-{
+public class UserAdapter implements UserRepository {
     @Inject
     EntityManager entityManager;
 
@@ -41,6 +41,7 @@ public class UserAdapter implements UserRepository
         return UserEntityConverter.fromEntity(entity);
     }
 
+    @Override
     public User getUser(long id) {
         UserEntity entity = entityManager.find(UserEntity.class, id);
         if (entity == null) {
@@ -48,6 +49,22 @@ public class UserAdapter implements UserRepository
         }
         return UserEntityConverter.fromEntity(entity);
     }
+
+    @Override
+    public User getUser(String mail) {
+        UserEntity entity = entityManager
+                .createQuery("SELECT u FROM UserEntity u WHERE u.masterEmail = :mail", UserEntity.class)
+                .setParameter("mail", mail).getSingleResultOrNull();
+        if (entity == null)
+            throw new UserNotFoundException("Can't find user with this mail");
+        return UserEntityConverter.fromEntity(entity);
+    }
+
+    @Override
+    public void deleteAll() {
+        entityManager.createQuery("DELETE FROM UserEntity").executeUpdate();
+    }
+
 
 
 }
