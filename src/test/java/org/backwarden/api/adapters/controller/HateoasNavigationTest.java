@@ -133,9 +133,12 @@ public class HateoasNavigationTest extends BaseControllerTest {
                         .statusCode(200)
                         .extract();
 
+        String showAllVaults = extractLink(vaultResponse.headers(), "getAllVaults");
         String getAllCredentialsLink = extractLink(vaultResponse.headers(), "getAllCredentials");
         String deleteVaultLink = extractLink(vaultResponse.headers(), "deleteVault");
         Assertions.assertNotNull(deleteVaultLink);
+        Assertions.assertNotNull(showAllVaults);
+        Assertions.assertNotNull(getAllCredentialsLink);
 
         var credListResponse =
                 given()
@@ -177,6 +180,9 @@ public class HateoasNavigationTest extends BaseControllerTest {
                         .extract();
 
         String deleteCredentialLink = extractLink(credResponse.headers(), "deleteCredential");
+        String getAllCredentialsLink2 = extractLink(credResponse.headers(), "getAllCredentials");
+        Assertions.assertNotNull(getAllCredentialsLink2);
+
 
         // DELETE credential
         given()

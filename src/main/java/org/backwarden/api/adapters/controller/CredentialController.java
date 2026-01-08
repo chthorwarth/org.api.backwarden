@@ -71,7 +71,7 @@ public class CredentialController implements CredentialsApi {
             CredentialDTO credentialDTO = CredentialDTOConverter.toDTO(credentialService.getCredential(credentialId));
             credentialDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("credentialid", credentialId).resolveTemplate("vaultid", vaultId).build());
 
-            return Response.ok(credentialDTO).link(deleteCredential(uriInfo, vaultId, credentialId), relNameDeleteCredential).build();
+            return Response.ok(credentialDTO).link(deleteCredential(uriInfo, vaultId, credentialId), relNameDeleteCredential).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -100,7 +100,7 @@ public class CredentialController implements CredentialsApi {
 
             wrapperDTO.credentialDTOS(credentialDTOs);
 
-            return Response.ok(wrapperDTO).link(createCredentials(uriInfo, vaultId), relNameCreateCredentials).build();
+            return Response.ok(wrapperDTO).link(createCredentials(uriInfo, vaultId), relNameCreateCredentials).link(getOneVault(uriInfo, userId, vaultId), relNameGetOneVault).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();

@@ -158,8 +158,6 @@ public class VaultControllerTest extends BaseControllerTest {
         long userid = register("me@test.de", "Strong#12345");
         String token = token("me@test.de", "Strong#12345");
 
-        Map<String, String> map = new HashMap<>();
-
         long vaultid = createVault(token, userid);
 
         List<String> linkheaders = given()
@@ -173,6 +171,8 @@ public class VaultControllerTest extends BaseControllerTest {
                 .extract().headers().getValues("Link");
         Assertions.assertTrue(linkheaders.stream().anyMatch(s -> s.contains("rel=\"deleteVault\"")));
         Assertions.assertTrue(linkheaders.stream().anyMatch(s -> s.contains("/users/" + userid + "/vaults/" + vaultid)));
+        Assertions.assertTrue(linkheaders.stream().anyMatch(s -> s.contains("rel=\"getAllCredentials\"")));
+        Assertions.assertTrue(linkheaders.stream().anyMatch(s -> s.contains("rel=\"getAllVaults\"")));
     }
 
     @Test

@@ -7,6 +7,7 @@ import java.net.URI;
 public class LinkHelper {
 
     public final static String relNameGetAllVaults = "getAllVaults";
+    public final static String relNameGetOneVault = "getOneVault";
     public final static String relNameGetAllCredentials = "getAllCredentials";
     public final static String relNameDeleteVault = "deleteVault";
     public final static String relNameCreateVault = "createVault";
@@ -14,11 +15,21 @@ public class LinkHelper {
     public final static String relNameCreateCredentials = "createCredential";
     public final static String relNameDeleteCredential = "deleteCredential";
 
+
     public static URI getAllVaults(UriInfo uriInfo, long userId) {
         return uriInfo
                 .getBaseUriBuilder()
                 .path("users/{userid}/vaults")
                 .resolveTemplate("userid", userId)
+                .build();
+    }
+
+    public static URI getOneVault(UriInfo uriInfo, long userId, long vaultid) {
+        return uriInfo
+                .getBaseUriBuilder()
+                .path("users/{userid}/vaults/{vaultid}")
+                .resolveTemplate("userid", userId)
+                .resolveTemplate("vaultid", vaultid)
                 .build();
     }
 

@@ -133,6 +133,9 @@ public class CredentialControllerTest extends BaseControllerTest {
         Assertions.assertTrue(
                 linkHeaders.stream().anyMatch(h -> h.contains("rel=\"deleteCredential\""))
         );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"getAllCredentials\""))
+        );
     }
 
     @Test
