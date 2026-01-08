@@ -176,7 +176,7 @@ public class HateoasNavigationTest extends BaseControllerTest {
                         .statusCode(200)
                         .extract();
 
-        String deleteCredentialLink = extractLink(credResponse.headers(), "deleteVault");
+        String deleteCredentialLink = extractLink(credResponse.headers(), "deleteCredential");
 
         // DELETE credential
         given()

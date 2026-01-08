@@ -8,16 +8,14 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.backwarden.api.adapters.controller.model.converter.VaultDTOConverter;
-import org.backwarden.api.adapters.database.model.VaultEntity;
-import org.backwarden.api.adapters.database.model.converter.VaultEntityConverter;
 import org.backwarden.api.logic.ports.input.VaultUseCase;
 import org.openapitools.api.VaultsApi;
 import org.openapitools.model.VaultCreationDTO;
 import org.openapitools.model.VaultDTO;
-import org.openapitools.model.VaultUpdateDTO;
 import org.openapitools.model.VaultWrapperDTO;
 
-import java.net.URI;
+import static org.backwarden.api.adapters.controller.LinkHelper.*;
+
 import java.util.List;
 
 
@@ -53,13 +51,8 @@ public class VaultController implements VaultsApi {
             //URI.create(uriInfo.getAbsolutePathBuilder() + "/users/" + userId + "/vaults/" + vaultDTO.getId()));
         }
 
-        URI vaultsCreate = uriInfo
-                .getBaseUriBuilder()
-                .path("users/{userid}/vaults")
-                .resolveTemplate("userid", currentUserId)
-                .build();
         vaultWrapperDTO.setVaultDTOS(vaultDTOS);
-        return Response.ok(vaultWrapperDTO).link(vaultsCreate, "createVault").build();
+        return Response.ok(vaultWrapperDTO).link(createVault(uriInfo, userId), relNameCreateVault).build();
     }
 
     @Override
@@ -80,13 +73,8 @@ public class VaultController implements VaultsApi {
         if (currentUserId != userId) {
             throw new ForbiddenException("Not your account");
         }
-        URI getAllVaults = uriInfo
-                .getBaseUriBuilder()
-                .path("users/{userid}/vaults")
-                .resolveTemplate("userid", currentUserId)
-                .build();
         vaultService.deleteVault(vaultId);
-        return Response.noContent().link(getAllVaults, "getAllVaults").build();
+        return Response.noContent().link(getAllVaults(uriInfo, userId), relNameGetAllVaults).build();
     }
 
     @Override
@@ -99,18 +87,8 @@ public class VaultController implements VaultsApi {
         VaultDTO vaultDTO = VaultDTOConverter.toDTO(vaultService.getVault(vaultId));
         vaultDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/users/{userid}/vaults/{vaultid}").resolveTemplate("userid", userId).resolveTemplate("vaultid", vaultDTO.getId()).build());
 
-        URI credentialsGet = uriInfo
-                .getBaseUriBuilder()
-                .path("vaults/{vaultid}/credentials")
-                .resolveTemplate("vaultid", vaultDTO.getId())
-                .build();
-        URI deleteVault = uriInfo
-                .getBaseUriBuilder()
-                .path("users/{userid}/vaults/{vaultid}")
-                .resolveTemplate("userid", currentUserId)
-                .resolveTemplate("vaultid", vaultDTO.getId())
-                .build();
-        return Response.ok(vaultDTO).link(credentialsGet, "getAllCredentials").link(deleteVault, "deleteVault").build();
+
+        return Response.ok(vaultDTO).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).link(deleteVault(uriInfo, userId, vaultId), relNameDeleteVault).link(getAllVaults(uriInfo, currentUserId), relNameGetAllVaults).build();
     }
 
 }

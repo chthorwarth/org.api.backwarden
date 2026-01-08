@@ -3,9 +3,11 @@ package org.backwarden.api.adapters.controller;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.CredentialCreationDTO;
-import org.openapitools.model.CredentialDTO;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -23,17 +25,7 @@ public class CredentialControllerTest extends BaseControllerTest {
 
     private long createCredential(String token, long vaultId, CredentialCreationDTO dto) {
 
-        String location =
-                given()
-                        .auth().oauth2(token)
-                        .contentType(ContentType.JSON)
-                        .body(dto)
-                        .when()
-                        .post("/vaults/" + vaultId + "/credentials")
-                        .then()
-                        .statusCode(201)
-                        .extract()
-                        .header("Location");
+        String location = given().auth().oauth2(token).contentType(ContentType.JSON).body(dto).when().post("/vaults/" + vaultId + "/credentials").then().statusCode(201).extract().header("Location");
 
         return Long.parseLong(location.substring(location.lastIndexOf('/') + 1));
     }
@@ -52,20 +44,10 @@ public class CredentialControllerTest extends BaseControllerTest {
         long vaultId = createVault(token, userId);
         long credentialId = createCredential(token, vaultId, getCredentialDTO());
 
-        given()
-                .auth().oauth2(token)
-                .when()
-                .get("/vaults/" + vaultId + "/credentials")
-                .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("credentialDTOS[0].password", containsString(getCredentialDTO().getPassword()))
-                .body("credentialDTOS", notNullValue())
-                .body("credentialDTOS[0].selfLink",
-                        containsString("/vaults/" + vaultId + "/credentials/" + credentialId))
-                .body("selfLink", containsString("/vaults/" + vaultId + "/credentials"))
-                .header("Link", containsString("rel=\"createCredential\""))
-                .header("Link", containsString("/vaults/" + vaultId + "/credentials"));
+        List<String> linkHeaders = given().auth().oauth2(token).when().get("/vaults/" + vaultId + "/credentials").then().statusCode(200).contentType(ContentType.JSON).body("credentialDTOS[0].password", containsString(getCredentialDTO().getPassword())).body("credentialDTOS", notNullValue()).body("credentialDTOS[0].selfLink", containsString("/vaults/" + vaultId + "/credentials/" + credentialId)).body("selfLink", containsString("/vaults/" + vaultId + "/credentials")).extract().headers().getValues("Link");
+
+        Assertions.assertTrue(linkHeaders.stream().anyMatch(h -> h.contains("rel=\"createCredential\"")), "Link-Header muss rel=\"createCredential\" enthalten");
+        Assertions.assertTrue(linkHeaders.stream().anyMatch(h -> h.contains("/vaults/" + vaultId + "/credentials")), "Link-Header muss Credential-Collection enthalten");
     }
 
     @Test
@@ -79,12 +61,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         long user2 = register("other@test.de", "Strong#12345");
         String token2 = token("other@test.de", "Strong#12345");
 
-        given()
-                .auth().oauth2(token2)
-                .when()
-                .get("/vaults/" + vaultId + "/credentials")
-                .then()
-                .statusCode(403);
+        given().auth().oauth2(token2).when().get("/vaults/" + vaultId + "/credentials").then().statusCode(403);
     }
 
 
@@ -104,16 +81,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         dto.setUsername("me");
         dto.setPassword("pw");
 
-        given()
-                .auth().oauth2(token)
-                .contentType(ContentType.JSON)
-                .body(dto)
-                .when()
-                .post("/vaults/" + vaultId + "/credentials")
-                .then()
-                .statusCode(201)
-                .header("Location",
-                        matchesPattern(".*/vaults/" + vaultId + "/credentials/[0-9]+$"));
+        given().auth().oauth2(token).contentType(ContentType.JSON).body(dto).when().post("/vaults/" + vaultId + "/credentials").then().statusCode(201).header("Location", matchesPattern(".*/vaults/" + vaultId + "/credentials/[0-9]+$"));
     }
 
     @Test
@@ -132,14 +100,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         dto.setUsername("x");
         dto.setPassword("x");
 
-        given()
-                .auth().oauth2(token2)
-                .contentType(ContentType.JSON)
-                .body(dto)
-                .when()
-                .post("/vaults/" + vaultId + "/credentials")
-                .then()
-                .statusCode(403);
+        given().auth().oauth2(token2).contentType(ContentType.JSON).body(dto).when().post("/vaults/" + vaultId + "/credentials").then().statusCode(403);
     }
 
 
@@ -155,16 +116,23 @@ public class CredentialControllerTest extends BaseControllerTest {
         long vaultId = createVault(token, userId);
         long credId = createCredential(token, vaultId, getCredentialDTO());
 
-        given()
-                .auth().oauth2(token)
-                .when()
-                .get("/vaults/" + vaultId + "/credentials/" + credId)
-                .then()
-                .statusCode(200)
-                .body(containsString(getCredentialDTO().getPassword()))
-                .body("selfLink",
-                        containsString("/vaults/" + vaultId + "/credentials/" + credId))
-                .header("Link", containsString("rel=\"deleteVault\""));
+        List<String> linkHeaders =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/vaults/" + vaultId + "/credentials/" + credId)
+                        .then()
+                        .statusCode(200)
+                        .body(containsString(getCredentialDTO().getPassword()))
+                        .body("selfLink",
+                                containsString("/vaults/" + vaultId + "/credentials/" + credId))
+                        .extract()
+                        .headers()
+                        .getValues("Link");
+
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"deleteCredential\""))
+        );
     }
 
     @Test
@@ -178,12 +146,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         long u2 = register("b@test.de", "Strong#12345");
         String t2 = token("b@test.de", "Strong#12345");
 
-        given()
-                .auth().oauth2(t2)
-                .when()
-                .get("/vaults/" + vaultId + "/credentials/" + credId)
-                .then()
-                .statusCode(403);
+        given().auth().oauth2(t2).when().get("/vaults/" + vaultId + "/credentials/" + credId).then().statusCode(403);
     }
 
 
@@ -199,14 +162,25 @@ public class CredentialControllerTest extends BaseControllerTest {
         long vaultId = createVault(token, userId);
         long credId = createCredential(token, vaultId, getCredentialDTO());
 
-        given()
-                .auth().oauth2(token)
-                .when()
-                .delete("/vaults/" + vaultId + "/credentials/" + credId)
-                .then()
-                .statusCode(204)
-                .header("Link", containsString("rel=\"getAllCredentials\""))
-                .header("Link", containsString("/vaults/" + vaultId));
+        List<String> linkHeaders =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .delete("/vaults/" + vaultId + "/credentials/" + credId)
+                        .then()
+                        .statusCode(204)
+                        .extract()
+                        .headers()
+                        .getValues("Link");
+
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"getAllCredentials\"")),
+                "Link-Header muss rel=\"getAllCredentials\" enthalten"
+        );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("/vaults/" + vaultId)),
+                "Link-Header muss Vault-Link enthalten"
+        );
     }
 
     @Test
@@ -220,11 +194,6 @@ public class CredentialControllerTest extends BaseControllerTest {
         long u2 = register("b@test.de", "Strong#12345");
         String t2 = token("b@test.de", "Strong#12345");
 
-        given()
-                .auth().oauth2(t2)
-                .when()
-                .delete("/vaults/" + vaultId + "/credentials/" + credId)
-                .then()
-                .statusCode(403);
+        given().auth().oauth2(t2).when().delete("/vaults/" + vaultId + "/credentials/" + credId).then().statusCode(403);
     }
 }

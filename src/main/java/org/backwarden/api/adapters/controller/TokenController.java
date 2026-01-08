@@ -50,11 +50,7 @@ public class TokenController {
         if (user == null) {
             throw new NotAuthorizedException("Invalid credentials");
         }
-        URI vaults = uriInfo
-                .getBaseUriBuilder()
-                .path("users/{userid}/vaults")
-                .resolveTemplate("userid", user.getId())
-                .build();
-        return Response.created(null).link(vaults, "getAllVaults").entity(token).build();
+
+        return Response.created(null).link(LinkHelper.getAllVaults(uriInfo, user.getId()), "getAllVaults").entity(token).build();
     }
 }

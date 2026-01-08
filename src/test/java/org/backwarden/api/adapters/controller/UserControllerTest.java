@@ -5,10 +5,13 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.backwarden.api.adapters.database.UserAdapter;
 import org.backwarden.api.adapters.database.model.UserEntity;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.UserDTO;
 import org.openapitools.model.UserRegistrationDTO;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -23,16 +26,27 @@ public class UserControllerTest extends BaseControllerTest {
         req.masterEmail("unique@test.de");
         req.masterPassword("Strong#12345");
 
-        given()
-                .contentType("application/json")
-                .body(req)
-                .when()
-                .post("/users")
-                .then()
-                .statusCode(201)
-                .header("Location", matchesPattern(".*/users/[0-9]+$"))
-                .header("Link", containsString("rel=\"generateToken\""))
-                .header("Link", containsString("/token"));
+        List<String> linkHeaders =
+                given()
+                        .contentType("application/json")
+                        .body(req)
+                        .when()
+                        .post("/users")
+                        .then()
+                        .statusCode(201)
+                        .header("Location", matchesPattern(".*/users/[0-9]+$"))
+                        .extract()
+                        .headers()
+                        .getValues("Link");
+
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"generateToken\"")),
+                "Link-Header muss rel=\"generateToken\" enthalten"
+        );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("/token")),
+                "Link-Header muss /token enthalten"
+        );
     }
 
     @Test

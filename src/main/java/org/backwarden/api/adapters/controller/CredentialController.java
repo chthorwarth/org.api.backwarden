@@ -19,9 +19,10 @@ import org.openapitools.model.CredentialWrapperDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import static org.backwarden.api.adapters.controller.LinkHelper.*;
 
 @ApplicationScoped
 public class CredentialController implements CredentialsApi {
@@ -48,12 +49,8 @@ public class CredentialController implements CredentialsApi {
                 throw new ForbiddenException("Not your account");
             }
             credentialService.deleteCredential(credentialId);
-            URI getAllCredentials = uriInfo
-                    .getBaseUriBuilder()
-                    .path("/vaults/{vaultid}")
-                    .resolveTemplate("vaultid", vaultId)
-                    .build();
-            return Response.noContent().link(getAllCredentials, "getAllCredentials").build();
+
+            return Response.noContent().link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -73,13 +70,8 @@ public class CredentialController implements CredentialsApi {
             }
             CredentialDTO credentialDTO = CredentialDTOConverter.toDTO(credentialService.getCredential(credentialId));
             credentialDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("credentialid", credentialId).resolveTemplate("vaultid", vaultId).build());
-            URI vaultsDelete = uriInfo
-                    .getBaseUriBuilder()
-                    .path("vaults/{vaultid}/credentials/{credentialid}")
-                    .resolveTemplate("vaultid", vaultId)
-                    .resolveTemplate("credentialid", credentialDTO.getId())
-                    .build();
-            return Response.ok(credentialDTO).link(vaultsDelete, "deleteVault").build();
+
+            return Response.ok(credentialDTO).link(deleteCredential(uriInfo, vaultId, credentialId), relNameDeleteCredential).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -103,16 +95,12 @@ public class CredentialController implements CredentialsApi {
             List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId));
 
             for (CredentialDTO dto : credentialDTOs)
-                dto.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("vaultid", vaultId).resolveTemplate("credentialid", dto.getId()).build());
+                dto.setSelfLink(credentialLocation(uriInfo, vaultId, dto.getId()));
 
 
             wrapperDTO.credentialDTOS(credentialDTOs);
-            URI credentialsCreate = uriInfo
-                    .getBaseUriBuilder()
-                    .path("vaults/{vaultid}/credentials")
-                    .resolveTemplate("vaultid", vaultId)
-                    .build();
-            return Response.ok(wrapperDTO).link(credentialsCreate, "createCredential").build();
+
+            return Response.ok(wrapperDTO).link(createCredentials(uriInfo, vaultId), relNameCreateCredentials).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -131,7 +119,7 @@ public class CredentialController implements CredentialsApi {
                 throw new ForbiddenException("Not your account");
             }
             long credentialid = credentialService.createCredentials(CredentialDTOConverter.fromDTO(credentialCreationDTO), vaultId);
-            return Response.created(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("credentialid", credentialid).resolveTemplate("vaultid", vaultId).build()).build();
+            return Response.created(credentialLocation(uriInfo, vaultId, credentialid)).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();

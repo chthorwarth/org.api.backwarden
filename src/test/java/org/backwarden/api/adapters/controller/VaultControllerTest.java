@@ -3,6 +3,7 @@ package org.backwarden.api.adapters.controller;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.restassured.http.Headers;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.backwarden.api.adapters.database.UserAdapter;
@@ -10,10 +11,16 @@ import org.backwarden.api.adapters.database.VaultAdapter;
 import org.backwarden.api.adapters.database.model.UserEntity;
 import org.backwarden.api.logic.ports.output.persistence.UserRepository;
 import org.backwarden.api.logic.ports.output.persistence.VaultRepository;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.UserRegistrationDTO;
 import org.openapitools.model.VaultCreationDTO;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -29,20 +36,31 @@ public class VaultControllerTest extends BaseControllerTest {
 
         long vaultid = createVault(token, userid);
 
-        given()
-                .auth().oauth2(token)
-                .when()
-                .get("/users/" + userid + "/vaults")
-                .then()
-                .log().body()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("vaultDTOS", notNullValue())
-                .body("selfLink", containsString("/users/" + userid + "/vaults"))
-                .body("vaultDTOS[0].selfLink",
-                        containsString("/users/" + userid + "/vaults/" + vaultid))
-                .header("Link", containsString("rel=\"createVault\""))
-                .header("Link", containsString("/users/" + userid + "/vaults"));
+        List<String> linkHeaders =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/users/" + userid + "/vaults")
+                        .then()
+                        .log().body()
+                        .statusCode(200)
+                        .contentType(ContentType.JSON)
+                        .body("vaultDTOS", notNullValue())
+                        .body("selfLink", containsString("/users/" + userid + "/vaults"))
+                        .body("vaultDTOS[0].selfLink",
+                                containsString("/users/" + userid + "/vaults/" + vaultid))
+                        .extract()
+                        .headers()
+                        .getValues("Link");
+
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"createVault\"")),
+                "Link-Header muss rel=\"createVault\" enthalten"
+        );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("/users/" + userid + "/vaults")),
+                "Link-Header muss Vault-Collection enthalten"
+        );
     }
 
     @Test
@@ -113,14 +131,25 @@ public class VaultControllerTest extends BaseControllerTest {
 
         long vaultid = createVault(token, userid);
 
-        given()
-                .auth().oauth2(token)
-                .when()
-                .delete("/users/" + userid + "/vaults/" + vaultid)
-                .then()
-                .statusCode(204)
-                .header("Link", containsString("rel=\"getAllVaults\""))
-                .header("Link", containsString("/users/" + userid + "/vaults"));
+        List<String> linkHeaders =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .delete("/users/" + userid + "/vaults/" + vaultid)
+                        .then()
+                        .statusCode(204)
+                        .extract()
+                        .headers()
+                        .getValues("Link");
+
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"getAllVaults\"")),
+                "Link-Header muss rel=\"getAllVaults\" enthalten"
+        );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("/users/" + userid + "/vaults")),
+                "Link-Header muss Vault-Collection enthalten"
+        );
     }
 
     @Test
@@ -129,17 +158,21 @@ public class VaultControllerTest extends BaseControllerTest {
         long userid = register("me@test.de", "Strong#12345");
         String token = token("me@test.de", "Strong#12345");
 
+        Map<String, String> map = new HashMap<>();
+
         long vaultid = createVault(token, userid);
 
-        given()
+        List<String> linkheaders = given()
                 .auth().oauth2(token)
                 .when()
                 .get("/users/" + userid + "/vaults/" + vaultid)
                 .then()
+                .log().headers()
                 .statusCode(200)
                 .body("selfLink", containsString("/users/" + userid + "/vaults/" + vaultid))
-                .header("Link", containsString("rel=\"deleteVault\""))
-                .header("Link", containsString("/users/" + userid + "/vaults/" + vaultid));
+                .extract().headers().getValues("Link");
+        Assertions.assertTrue(linkheaders.stream().anyMatch(s -> s.contains("rel=\"deleteVault\"")));
+        Assertions.assertTrue(linkheaders.stream().anyMatch(s -> s.contains("/users/" + userid + "/vaults/" + vaultid)));
     }
 
     @Test
