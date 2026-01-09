@@ -2,6 +2,7 @@ package org.backwarden.api.logic.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Vault {
     private long id;
@@ -48,5 +49,17 @@ public class Vault {
 
     public void setAutoFill(boolean autoFill) {
         this.autoFill = autoFill;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Vault vault = (Vault) o;
+        return id == vault.id && autoFill == vault.autoFill && Objects.equals(title, vault.title) && Objects.equals(user, vault.user) && Objects.equals(credentials, vault.credentials);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, autoFill);
     }
 }

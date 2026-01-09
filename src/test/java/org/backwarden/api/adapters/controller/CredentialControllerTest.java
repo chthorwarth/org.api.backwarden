@@ -15,21 +15,6 @@ import static org.hamcrest.Matchers.*;
 @QuarkusTest
 public class CredentialControllerTest extends BaseControllerTest {
 
-    CredentialCreationDTO getCredentialDTO() {
-        CredentialCreationDTO dto = new CredentialCreationDTO();
-        dto.setTitle("My Login");
-        dto.setUsername("user");
-        dto.setPassword("secret");
-        return dto;
-    }
-
-    private long createCredential(String token, long vaultId, CredentialCreationDTO dto) {
-
-        String location = given().auth().oauth2(token).contentType(ContentType.JSON).body(dto).when().post("/vaults/" + vaultId + "/credentials").then().statusCode(201).extract().header("Location");
-
-        return Long.parseLong(location.substring(location.lastIndexOf('/') + 1));
-    }
-
 
     // ─────────────────────────
     // GET ALL
@@ -199,4 +184,204 @@ public class CredentialControllerTest extends BaseControllerTest {
 
         given().auth().oauth2(t2).when().delete("/vaults/" + vaultId + "/credentials/" + credId).then().statusCode(403);
     }
+
+    @Test
+    void getSingleCredential_withMatchingEtag_returns304() {
+
+        long userId = register("etagcred@test.de", "Strong#12345");
+        String token = token("etagcred@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        long credId = createCredential(token, vaultId, getCredentialDTO());
+
+        // Erster Request → ETag holen
+        String etag =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/vaults/" + vaultId + "/credentials/" + credId)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        // Conditional GET mit If-None-Match
+        given()
+                .auth().oauth2(token)
+                .header("If-None-Match", etag)
+                .when()
+                .get("/vaults/" + vaultId + "/credentials/" + credId)
+                .then()
+                .statusCode(304)
+                .body(is(emptyOrNullString()));
+    }
+
+    @Test
+    void getSingleCredential_withNonMatchingEtag_returns200() {
+
+        long userId = register("etagcred2@test.de", "Strong#12345");
+        String token = token("etagcred2@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        long credId = createCredential(token, vaultId, getCredentialDTO());
+
+        given()
+                .auth().oauth2(token)
+                .header("If-None-Match", "\"wrong-etag\"")
+                .when()
+                .get("/vaults/" + vaultId + "/credentials/" + credId)
+                .then()
+                .statusCode(200)
+                .body(containsString(getCredentialDTO().getPassword()));
+    }
+
+    @Test
+    void getAllCredentials_firstRequest_returns200_andEtag() {
+
+        long userId = register("credwrap1@test.de", "Strong#12345");
+        String token = token("credwrap1@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        createCredential(token, vaultId, getCredentialDTO());
+
+        given()
+                .auth().oauth2(token)
+                .when()
+                .get("/vaults/" + vaultId + "/credentials")
+                .then()
+                .statusCode(200)
+                .header("ETag", notNullValue())
+                .body("credentialDTOS.size()", greaterThan(0));
+    }
+
+    @Test
+    void getAllCredentials_withMatchingEtag_returns304() {
+
+        long userId = register("credwrap2@test.de", "Strong#12345");
+        String token = token("credwrap2@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        createCredential(token, vaultId, getCredentialDTO());
+
+        // First GET → get ETag
+        String etag =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/vaults/" + vaultId + "/credentials")
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        // Conditional GET
+        given()
+                .auth().oauth2(token)
+                .header("If-None-Match", etag)
+                .when()
+                .get("/vaults/" + vaultId + "/credentials")
+                .then()
+                .statusCode(304)
+                .body(is(emptyOrNullString()));
+    }
+
+    @Test
+    void getAllCredentials_withWrongEtag_returns200() {
+
+        long userId = register("credwrap3@test.de", "Strong#12345");
+        String token = token("credwrap3@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        createCredential(token, vaultId, getCredentialDTO());
+
+        given()
+                .auth().oauth2(token)
+                .header("If-None-Match", "\"wrong-etag\"")
+                .when()
+                .get("/vaults/" + vaultId + "/credentials")
+                .then()
+                .statusCode(200)
+                .body("credentialDTOS.size()", greaterThan(0));
+    }
+
+
+    @Test
+    void getAllCredentials_afterCreatingCredential_etagChanges() {
+
+        long userId = register("credwrap4@test.de", "Strong#12345");
+        String token = token("credwrap4@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+
+        String etagBefore =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/vaults/" + vaultId + "/credentials")
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        createCredential(token, vaultId, getCredentialDTO());
+
+        String etagAfter =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/vaults/" + vaultId + "/credentials")
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        Assertions.assertNotEquals(etagBefore, etagAfter);
+    }
+
+    @Test
+    void deleteCredential_withMatchingEtag_returns204() {
+
+        long userId = register("cdel2@test.de", "Strong#12345");
+        String token = token("cdel2@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        long credId = createCredential(token, vaultId, getCredentialDTO());
+
+        String etag =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/vaults/" + vaultId + "/credentials/" + credId)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        given()
+                .auth().oauth2(token)
+                .header("If-Match", etag)
+                .when()
+                .delete("/vaults/" + vaultId + "/credentials/" + credId)
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    void deleteCredential_withNonMatchingEtag_returns412() {
+
+        long userId = register("cdel3@test.de", "Strong#12345");
+        String token = token("cdel3@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        long credId = createCredential(token, vaultId, getCredentialDTO());
+
+        given()
+                .auth().oauth2(token)
+                .header("If-Match", "\"wrong-etag\"")
+                .when()
+                .delete("/vaults/" + vaultId + "/credentials/" + credId)
+                .then()
+                .statusCode(412);
+    }
+
 }

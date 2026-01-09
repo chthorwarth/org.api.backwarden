@@ -37,6 +37,8 @@ public class VaultAdapter implements VaultRepository {
     @Override
     public Vault getVault(long id) {
         VaultEntity vaultEntity = entityManager.find(VaultEntity.class, id);
+        if (vaultEntity == null)
+            throw new NotFoundException("Vault with id " + id + " not found");
         User user = UserEntityConverter.fromEntity(vaultEntity.getUser());
         return VaultEntityConverter.fromEntity(vaultEntity, user);
     }

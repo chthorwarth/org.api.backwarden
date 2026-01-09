@@ -5,16 +5,17 @@ import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.*;
 import org.backwarden.api.adapters.controller.model.converter.CredentialDTOConverter;
 import org.backwarden.api.logic.exceptions.CryptionGoneWrongException;
+import org.backwarden.api.logic.model.Credential;
+import org.backwarden.api.logic.model.Vault;
 import org.backwarden.api.logic.ports.input.CredentialUseCase;
 import org.backwarden.api.logic.ports.input.VaultUseCase;
 import org.openapitools.api.CredentialsApi;
 import org.openapitools.model.CredentialCreationDTO;
 import org.openapitools.model.CredentialDTO;
+import org.openapitools.model.CredentialUpdateDTO;
 import org.openapitools.model.CredentialWrapperDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.backwarden.api.adapters.controller.LinkHelper.*;
+import static org.backwarden.api.adapters.controller.CacheControlHelper.*;
 
 @ApplicationScoped
 public class CredentialController implements CredentialsApi {
@@ -40,6 +42,9 @@ public class CredentialController implements CredentialsApi {
     @Context
     UriInfo uriInfo;
 
+    @Context
+    Request req;
+
     @Override
     public Response vaultsVaultIdCredentialsCredentialIdDelete(Integer vaultId, Integer credentialId) {
         try {
@@ -48,9 +53,14 @@ public class CredentialController implements CredentialsApi {
             if (currentUserId != userId) {
                 throw new ForbiddenException("Not your account");
             }
+            Credential credential = credentialService.getCredential(credentialId);
+            EntityTag etag = new EntityTag(Integer.toString(credential.hashCode()));
+            Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
+            if (builder != null) {
+                return builder.build();
+            }
             credentialService.deleteCredential(credentialId);
-
-            return Response.noContent().link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).build();
+            return Response.noContent().link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).cacheControl(notStore()).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -68,10 +78,15 @@ public class CredentialController implements CredentialsApi {
             if (currentUserId != userId) {
                 throw new ForbiddenException("Not your account");
             }
-            CredentialDTO credentialDTO = CredentialDTOConverter.toDTO(credentialService.getCredential(credentialId));
+            Credential credential = credentialService.getCredential(credentialId);
+            CredentialDTO credentialDTO = CredentialDTOConverter.toDTO(credential);
             credentialDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("credentialid", credentialId).resolveTemplate("vaultid", vaultId).build());
-
-            return Response.ok(credentialDTO).link(deleteCredential(uriInfo, vaultId, credentialId), relNameDeleteCredential).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).build();
+            EntityTag etag = new EntityTag(Integer.toString(credential.hashCode()));
+            Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
+            if (builder != null) {
+                return Response.notModified().build();
+            }
+            return Response.ok(credentialDTO).link(deleteCredential(uriInfo, vaultId, credentialId), relNameDeleteCredential).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).cacheControl(notStore()).tag(etag).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -79,6 +94,11 @@ public class CredentialController implements CredentialsApi {
             log.info(e.getMessage());
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+    }
+
+    @Override
+    public Response vaultsVaultIdCredentialsCredentialIdPut(Integer vaultId, Integer credentialId, CredentialUpdateDTO credentialUpdateDTO) {
+        return null;
     }
 
     @Override
@@ -96,11 +116,15 @@ public class CredentialController implements CredentialsApi {
 
             for (CredentialDTO dto : credentialDTOs)
                 dto.setSelfLink(credentialLocation(uriInfo, vaultId, dto.getId()));
-
-
             wrapperDTO.credentialDTOS(credentialDTOs);
 
-            return Response.ok(wrapperDTO).link(createCredentials(uriInfo, vaultId), relNameCreateCredentials).link(getOneVault(uriInfo, userId, vaultId), relNameGetOneVault).build();
+            EntityTag etag = new EntityTag(Integer.toString(wrapperDTO.hashCode()));
+            Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
+            if (builder != null) {
+                return Response.notModified().build();
+            }
+
+            return Response.ok(wrapperDTO).link(createCredentials(uriInfo, vaultId), relNameCreateCredentials).link(getOneVault(uriInfo, userId, vaultId), relNameGetOneVault).tag(etag).cacheControl(notStore()).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -119,7 +143,7 @@ public class CredentialController implements CredentialsApi {
                 throw new ForbiddenException("Not your account");
             }
             long credentialid = credentialService.createCredentials(CredentialDTOConverter.fromDTO(credentialCreationDTO), vaultId);
-            return Response.created(credentialLocation(uriInfo, vaultId, credentialid)).build();
+            return Response.created(credentialLocation(uriInfo, vaultId, credentialid)).cacheControl(notStore()).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();

@@ -20,6 +20,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.time.Duration;
 import java.util.Set;
 
+import static org.backwarden.api.adapters.controller.CacheControlHelper.*;
+import static org.backwarden.api.adapters.controller.LinkHelper.*;
+
 @Path("/token")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.TEXT_PLAIN)
@@ -51,6 +54,6 @@ public class TokenController {
             throw new NotAuthorizedException("Invalid credentials");
         }
 
-        return Response.created(null).link(LinkHelper.getAllVaults(uriInfo, user.getId()), "getAllVaults").entity(token).build();
+        return Response.created(null).link(getAllVaults(uriInfo, user.getId()), relNameGetAllVaults).link(getOneUser(uriInfo, user.getId()), relNameGetOneUser).entity(token).cacheControl(notStore()).build();
     }
 }

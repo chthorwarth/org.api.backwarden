@@ -11,9 +11,27 @@ public class LinkHelper {
     public final static String relNameGetAllCredentials = "getAllCredentials";
     public final static String relNameDeleteVault = "deleteVault";
     public final static String relNameCreateVault = "createVault";
+    public final static String relNameUpdateVault = "updateVault";
     public final static String relNameRegisterUser = "registerUser";
     public final static String relNameCreateCredentials = "createCredential";
     public final static String relNameDeleteCredential = "deleteCredential";
+    public final static String relNameGenerateToken = "generateToken";
+    public final static String relNameGetOneUser = "getOneUser";
+
+    public static URI getOneUser(UriInfo uriInfo, long userId) {
+        return uriInfo
+                .getBaseUriBuilder()
+                .path("users/{userid}")
+                .resolveTemplate("userid", userId)
+                .build();
+    }
+
+    public static URI createToken(UriInfo uriInfo) {
+        return uriInfo
+                .getBaseUriBuilder()
+                .path("token")
+                .build();
+    }
 
 
     public static URI getAllVaults(UriInfo uriInfo, long userId) {
@@ -55,6 +73,15 @@ public class LinkHelper {
                 .getBaseUriBuilder()
                 .path("users/{userid}/vaults")
                 .resolveTemplate("userid", userid)
+                .build();
+    }
+
+    public static URI updateVault(UriInfo uriInfo, long userid, long vaultid) {
+        return uriInfo
+                .getBaseUriBuilder()
+                .path("users/{userid}/vaults/{vaultid}")
+                .resolveTemplate("userid", userid)
+                .resolveTemplate("vaultid", vaultid)
                 .build();
     }
 

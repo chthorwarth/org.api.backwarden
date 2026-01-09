@@ -6,18 +6,21 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.*;
 import org.backwarden.api.adapters.controller.model.converter.UserDTOConverter;
 import org.backwarden.api.logic.exceptions.DomainValidationException;
 import org.backwarden.api.logic.exceptions.EmailAlreadyExistsException;
+import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.ports.input.UserUseCase;
 import org.openapitools.api.UsersApi;
 import org.openapitools.model.UserDTO;
 import org.openapitools.model.UserRegistrationDTO;
 
 import java.net.URI;
+
+import static org.backwarden.api.adapters.controller.CacheControlHelper.*;
+
+import static org.backwarden.api.adapters.controller.LinkHelper.*;
 
 @ApplicationScoped
 public class UserController implements UsersApi {
@@ -30,6 +33,9 @@ public class UserController implements UsersApi {
     @Inject
     SecurityIdentity identity;
 
+    @Context
+    Request req;
+
     @Override
     public Response usersPost(@Valid @NotNull UserRegistrationDTO userRegistrationDTO) {
         try {
@@ -38,11 +44,7 @@ public class UserController implements UsersApi {
                     .getAbsolutePathBuilder()
                     .path(String.valueOf(id))
                     .build();
-            URI token = uriInfo
-                    .getBaseUriBuilder()
-                    .path("token")
-                    .build();
-            return Response.created(location).link(token, "generateToken").build();
+            return Response.created(location).link(createToken(uriInfo), relNameGenerateToken).cacheControl(notStore()).build();
         } catch (DomainValidationException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())
@@ -62,8 +64,13 @@ public class UserController implements UsersApi {
             throw new ForbiddenException("Not your account");
         }
 
-        UserDTO dto = UserDTOConverter.toDTO(userService.getUser(userId));
-
-        return Response.ok(dto).build();
+        User user = userService.getUser(userId);
+        UserDTO dto = UserDTOConverter.toDTO(user);
+        EntityTag etag = new EntityTag(Integer.toString(user.hashCode()));
+        Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
+        if (builder != null) {
+            return builder.build();
+        }
+        return Response.ok(dto).cacheControl(cachePrivateMustRevalidate()).tag(etag).build();
     }
 }

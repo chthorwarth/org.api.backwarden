@@ -5,9 +5,12 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.backwarden.api.adapters.controller.model.LoginRequest;
 import org.backwarden.api.adapters.database.UserAdapter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.UserRegistrationDTO;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -25,7 +28,7 @@ public class TokenControllerTest extends BaseControllerTest {
         login.email = "login@test.de";
         login.password = "Strong#12345";
 
-        given()
+        List<String> linkHeaders = given()
                 .contentType("application/json")
                 .body(login)
                 .when()
@@ -36,11 +39,23 @@ public class TokenControllerTest extends BaseControllerTest {
                 // JWT consists from a Base64-Segment
                 .body(matchesPattern("^[^.]+\\.[^.]+\\.[^.]+$"))
                 .header("Location", nullValue())
-                .header("Link", containsString("rel=\"getAllVaults\""))
-                .header(
-                        "Link",
-                        matchesPattern(".*\\/users\\/[0-9]+\\/vaults.*")
-                );
+                .extract()
+                .headers().getValues("Link");
+
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"getAllVaults\"")),
+                "Link-Header muss rel=\"createVault\" enthalten"
+        );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.matches(".*\\/users\\/[0-9]+\\/vaults.*")),
+                "Link-Header muss Vault-Collection enthalten"
+        );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"getOneUser\""))
+        );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.matches(".*\\/users\\/[0-9]+.*"))
+        );
     }
 
     @Test

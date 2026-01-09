@@ -1,22 +1,20 @@
 package org.backwarden.api.adapters.controller;
 
-import io.quarkus.resteasy.runtime.QuarkusRestPathTemplate;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
+import io.restassured.mapper.ObjectMapper;
 import org.backwarden.api.adapters.controller.model.LoginRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openapitools.model.CredentialCreationDTO;
-import org.openapitools.model.UserRegistrationDTO;
-import org.openapitools.model.VaultCreationDTO;
+import org.openapitools.model.*;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 
 @QuarkusTest
 public class HateoasNavigationTest extends BaseControllerTest {
@@ -56,6 +54,8 @@ public class HateoasNavigationTest extends BaseControllerTest {
                         .headers();
 
         String registerLink = extractLink(api, "registerUser");
+        String gentokenLink = extractLink(api, "generateToken");
+        Assertions.assertNotNull(gentokenLink);
 
         // POST /users  (Register)
         UserRegistrationDTO reg = new UserRegistrationDTO();
@@ -136,9 +136,11 @@ public class HateoasNavigationTest extends BaseControllerTest {
         String showAllVaults = extractLink(vaultResponse.headers(), "getAllVaults");
         String getAllCredentialsLink = extractLink(vaultResponse.headers(), "getAllCredentials");
         String deleteVaultLink = extractLink(vaultResponse.headers(), "deleteVault");
+        String updateVaultLink = extractLink(vaultResponse.headers(), "updateVault");
         Assertions.assertNotNull(deleteVaultLink);
         Assertions.assertNotNull(showAllVaults);
         Assertions.assertNotNull(getAllCredentialsLink);
+        Assertions.assertNotNull(updateVaultLink);
 
         var credListResponse =
                 given()
@@ -148,8 +150,26 @@ public class HateoasNavigationTest extends BaseControllerTest {
                         .then()
                         .statusCode(200)
                         .extract();
-
         String createCredentialLink = extractLink(credListResponse.headers(), "createCredential");
+
+        // PUT vault (Follow link!)
+        VaultUpdateDTO vaultUpdate = new VaultUpdateDTO();
+        vaultUpdate.setTitle("My Vault Updated");
+        vaultUpdate.setAutoFill(false);
+        vaultUpdate.setId(1L);
+
+        var vaultUpdateResponse = given()
+                .auth().oauth2(token)
+                .contentType(ContentType.JSON)
+                .body(vaultUpdate)
+                .when()
+                .put(updateVaultLink)
+                .then()
+                .statusCode(204)
+                .extract();
+
+        String singleCredentialLink = extractLink(credListResponse.headers(), "getOneVault");
+        Assertions.assertNotNull(singleCredentialLink);
 
         // POST credential  (follow link!)
         CredentialCreationDTO cred = new CredentialCreationDTO();

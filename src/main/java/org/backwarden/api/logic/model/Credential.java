@@ -1,5 +1,7 @@
 package org.backwarden.api.logic.model;
 
+import java.util.Objects;
+
 public class Credential {
     private long id;
     private Vault vault;
@@ -81,5 +83,17 @@ public class Credential {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Credential that = (Credential) o;
+        return id == that.id && isPasswordSecure == that.isPasswordSecure && Objects.equals(vault, that.vault) && Objects.equals(title, that.title) && Objects.equals(username, that.username) && Objects.equals(password, that.password) && Objects.equals(passwordCiphertext, that.passwordCiphertext) && Objects.equals(passwordIV, that.passwordIV) && Objects.equals(note, that.note);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, isPasswordSecure, username, password, passwordCiphertext, passwordIV, note);
     }
 }

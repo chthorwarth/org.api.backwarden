@@ -146,6 +146,24 @@ paths:
                 $ref: '#/components/schemas/VaultDTO'
         '404':
           description: User or vault not found
+    put:
+      tags: [ Vaults ]
+      summary: Update a vault for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VaultUpdateDTO'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultDTO'
+        '404':
+          description: User or vault not found
 
     delete:
       tags: [ Vaults ]
@@ -210,6 +228,24 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialDTO'
+        '404':
+          description: Vault or credential not found
+    put:
+      tags: [ Credentials ]
+      summary: Update (replace) a specific credential by id in a vault
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialUpdateDTO'
+      responses:
+        '200':
+          description: Updated
           content:
             application/json:
               schema:

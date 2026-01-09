@@ -8,6 +8,7 @@ import org.backwarden.api.logic.ports.output.persistence.CredentialRepository;
 import org.backwarden.api.logic.ports.output.persistence.UserRepository;
 import org.backwarden.api.logic.ports.output.persistence.VaultRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.openapitools.model.CredentialCreationDTO;
 import org.openapitools.model.UserRegistrationDTO;
 import org.openapitools.model.VaultCreationDTO;
 
@@ -31,6 +32,14 @@ public class BaseControllerTest {
         credentialRepository.deleteAll();
         vaultRepository.deleteAll();
         userRepository.deleteAll();
+    }
+
+    CredentialCreationDTO getCredentialDTO() {
+        CredentialCreationDTO dto = new CredentialCreationDTO();
+        dto.setTitle("My Login");
+        dto.setUsername("user");
+        dto.setPassword("secret");
+        return dto;
     }
 
 
@@ -84,6 +93,13 @@ public class BaseControllerTest {
                 .extract()
                 .header("Location");
         System.out.println(location);
+        return Long.parseLong(location.substring(location.lastIndexOf('/') + 1));
+    }
+
+    long createCredential(String token, long vaultId, CredentialCreationDTO dto) {
+
+        String location = given().auth().oauth2(token).contentType(ContentType.JSON).body(dto).when().post("/vaults/" + vaultId + "/credentials").then().statusCode(201).extract().header("Location");
+
         return Long.parseLong(location.substring(location.lastIndexOf('/') + 1));
     }
 }

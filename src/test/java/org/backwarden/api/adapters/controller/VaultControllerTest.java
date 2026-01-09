@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.UserRegistrationDTO;
 import org.openapitools.model.VaultCreationDTO;
+import org.openapitools.model.VaultUpdateDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -206,5 +207,210 @@ public class VaultControllerTest extends BaseControllerTest {
                 .get(location)
                 .then()
                 .statusCode(403);
+    }
+
+    @Test
+    void getVaults_firstRequest_returns200AndEtag() {
+
+        long userId = register("etag@test.de", "Strong#12345");
+        String token = token("etag@test.de", "Strong#12345");
+
+        given()
+                .auth().oauth2(token)
+                .when()
+                .get("/users/" + userId + "/vaults")
+                .then()
+                .statusCode(200)
+                .header("ETag", notNullValue());
+    }
+
+    @Test
+    void getVaults_withMatchingEtag_returns304() {
+
+        long userId = register("etag2@test.de", "Strong#12345");
+        String token = token("etag2@test.de", "Strong#12345");
+
+        // erster Request → ETag holen
+        String etag =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/users/" + userId + "/vaults")
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        // zweiter Request mit If-None-Match
+        given()
+                .auth().oauth2(token)
+                .header("If-None-Match", etag)
+                .when()
+                .get("/users/" + userId + "/vaults")
+                .then()
+                .statusCode(304)
+                .body(is(emptyOrNullString()));
+    }
+
+    @Test
+    void getVaults_withNonMatchingEtag_returns200() {
+
+        long userId = register("etag3@test.de", "Strong#12345");
+        String token = token("etag3@test.de", "Strong#12345");
+
+        given()
+                .auth().oauth2(token)
+                .header("If-None-Match", "\"wrong-etag\"")
+                .when()
+                .get("/users/" + userId + "/vaults")
+                .then()
+                .statusCode(200)
+                .header("ETag", not("\"wrong-etag\""));
+    }
+
+    @Test
+    void getVaults_afterCreatingVault_etagChanges() {
+
+        long userId = register("etag4@test.de", "Strong#12345");
+        String token = token("etag4@test.de", "Strong#12345");
+
+        VaultCreationDTO dto = new VaultCreationDTO();
+        dto.setTitle("My Vault");
+        dto.setAutoFill(true);
+
+        String etagBefore =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/users/" + userId + "/vaults")
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        // neue Vault anlegen
+        given()
+                .auth().oauth2(token)
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .when()
+                .post("/users/" + userId + "/vaults")
+                .then()
+                .statusCode(201);
+
+        String etagAfter =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/users/" + userId + "/vaults")
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        Assertions.assertNotEquals(etagBefore, etagAfter);
+    }
+
+    @Test
+    void putVault_withNonMatchingEtag_returns412() {
+
+
+        long userId = register("put3@test.de", "Strong#12345");
+        String token = token("put3@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+
+        VaultUpdateDTO vaultUpdateDTO = new VaultUpdateDTO();
+        vaultUpdateDTO.title("Should Not Update");
+        vaultUpdateDTO.setId(vaultId);
+        vaultUpdateDTO.setAutoFill(true);
+
+        given()
+                .auth().oauth2(token)
+                .header("If-Match", "\"wrong-etag\"")
+                .contentType("application/json")
+                .body(vaultUpdateDTO)
+                .when()
+                .put("/users/" + userId + "/vaults/" + vaultId)
+                .then()
+                .statusCode(412);
+    }
+
+    @Test
+    void putVault_withMatchingEtag_returns204() {
+
+        long userId = register("put2@test.de", "Strong#12345");
+        String token = token("put2@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+
+        VaultUpdateDTO vaultUpdateDTO = new VaultUpdateDTO();
+        vaultUpdateDTO.title("Should Not Update");
+        vaultUpdateDTO.setId(vaultId);
+        vaultUpdateDTO.setAutoFill(true);
+
+        String etag =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/users/" + userId + "/vaults/" + vaultId)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        given()
+                .auth().oauth2(token)
+                .header("If-Match", etag)
+                .contentType("application/json")
+                .body(vaultUpdateDTO)
+                .when()
+                .put("/users/" + userId + "/vaults/" + vaultId)
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    void deleteVault_withMatchingEtag_returns204() {
+
+        long userId = register("del2@test.de", "Strong#12345");
+        String token = token("del2@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+
+        String etag =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/users/" + userId + "/vaults/" + vaultId)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        given()
+                .auth().oauth2(token)
+                .header("If-Match", etag)
+                .when()
+                .delete("/users/" + userId + "/vaults/" + vaultId)
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    void deleteVault_withNonMatchingEtag_returns412() {
+
+        long userId = register("del3@test.de", "Strong#12345");
+        String token = token("del3@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+
+        given()
+                .auth().oauth2(token)
+                .header("If-Match", "\"wrong-etag\"")
+                .when()
+                .delete("/users/" + userId + "/vaults/" + vaultId)
+                .then()
+                .statusCode(412);
     }
 }
