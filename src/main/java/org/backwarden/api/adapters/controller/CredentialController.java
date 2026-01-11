@@ -5,6 +5,7 @@ import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
@@ -90,7 +91,7 @@ public class CredentialController implements CredentialsApi {
     }
 
     @Override
-    public Response vaultsVaultIdCredentialsGet(Integer vaultId) {
+    public Response vaultsVaultIdCredentialsGet(Integer vaultId, @QueryParam("title") String title) {
         try {
             long currentUserId = Long.parseLong(identity.getPrincipal().getName());
             long userId = vaultService.getUserIdByVaultId(vaultId);
@@ -98,13 +99,19 @@ public class CredentialController implements CredentialsApi {
                 throw new ForbiddenException("Not your account");
             }
             CredentialWrapperDTO wrapperDTO = new CredentialWrapperDTO();
-            wrapperDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials").resolveTemplate("vaultid", vaultId).build());
+            wrapperDTO.setSelfLink(uriInfo.getBaseUriBuilder()
+                    .path("/vaults/{vaultid}/credentials")
+                    .resolveTemplate("vaultid", vaultId)
+                    .build());
 
-            List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId));
+            List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId,title));
 
             for (CredentialDTO dto : credentialDTOs)
-                dto.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("vaultid", vaultId).resolveTemplate("credentialid", dto.getId()).build());
-
+                dto.setSelfLink(uriInfo.getBaseUriBuilder()
+                        .path("/vaults/{vaultid}/credentials/{credentialid}")
+                        .resolveTemplate("vaultid", vaultId)
+                        .resolveTemplate("credentialid", dto.getId())
+                        .build());
 
             wrapperDTO.credentialDTOS(credentialDTOs);
             URI credentialsCreate = uriInfo
@@ -112,6 +119,7 @@ public class CredentialController implements CredentialsApi {
                     .path("vaults/{vaultid}/credentials")
                     .resolveTemplate("vaultid", vaultId)
                     .build();
+
             return Response.ok(wrapperDTO).link(credentialsCreate, "createCredential").build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());

@@ -10,7 +10,7 @@ public interface CredentialUseCase {
 
     public Credential getCredential(long id);
 
-    public List<Credential> getAllCredentials(long vaultId);
+    public List<Credential> getAllCredentials(long vaultId, String title);
 
     public void deleteCredential(long id);
 

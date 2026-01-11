@@ -1,5 +1,6 @@
 package org.backwarden.api.adapters.database;
 
+import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.NotFoundException;
 import org.backwarden.api.adapters.database.model.CredentialEntity;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -39,6 +40,7 @@ public class CredentialAdapter implements CredentialRepository {
         return CredentialEntityConverter.fromEntity(credentialEntity, VaultEntityConverter.fromEntity(vaultEntity, UserEntityConverter.fromEntity(vaultEntity.getUser())));
     }
 
+    @Override
     public Credential getCredential(long id) {
         CredentialEntity credentialEntity = entityManager.find(CredentialEntity.class, id);
         if (credentialEntity == null)
@@ -50,22 +52,41 @@ public class CredentialAdapter implements CredentialRepository {
     }
 
 
-    //currently not working because of converter classes. Maybe we should add only vaultId to the DTO and model classes and save the Vault object in Entity class
     @Override
-    public List<Credential> getAllCredentials(long vaultId) {
+    public List<Credential> getAllCredentials(long vaultId, String title) {
+
         VaultEntity vaultEntity = entityManager.find(VaultEntity.class, vaultId);
 
         if (vaultEntity == null) {
             throw new NotFoundException("Vault not found: " + vaultId);
         }
 
-        List<CredentialEntity> credentialEntities = entityManager.createQuery("SELECT c FROM CredentialEntity c WHERE c.vault.id = :vaultId", CredentialEntity.class)
-                .setParameter("vaultId", vaultEntity.getId())
-                .getResultList();
+        String sql =
+                "SELECT c FROM CredentialEntity c " +
+                        "WHERE c.vault.id = :vaultId";
+
+        if (title != null && !title.isBlank()) {
+            sql += " AND LOWER(c.title) LIKE :title";
+        }
+
+        TypedQuery<CredentialEntity> query =
+                entityManager.createQuery(sql, CredentialEntity.class)
+                        .setParameter("vaultId", vaultEntity.getId());
+
+        if (title != null && !title.isBlank()) {
+            query.setParameter("title", "%" + title.toLowerCase() + "%");
+        }
+
+        List<CredentialEntity> credentialEntities = query.getResultList();
+
         User user = UserEntityConverter.fromEntity(vaultEntity.getUser());
 
-        return CredentialEntityConverter.fromEntityList(credentialEntities, VaultEntityConverter.fromEntity(vaultEntity, user));
+        return CredentialEntityConverter.fromEntityList(
+                credentialEntities,
+                VaultEntityConverter.fromEntity(vaultEntity, user)
+        );
     }
+
 
     @Override
     public void deleteCredential(long id) {

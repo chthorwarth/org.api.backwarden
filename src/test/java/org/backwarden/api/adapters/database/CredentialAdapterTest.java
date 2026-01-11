@@ -161,7 +161,7 @@ class CredentialAdapterTest {
         entityManager.flush();
         entityManager.clear();
 
-        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId);
+        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId, "");
 
         assertEquals(2, credentials.size());
     }
@@ -171,7 +171,7 @@ class CredentialAdapterTest {
     {
         assertThrows(
                 NotFoundException.class,
-                () -> credentialAdapter.getAllCredentials(99999L)
+                () -> credentialAdapter.getAllCredentials(99999L, "")
         );
     }
 
