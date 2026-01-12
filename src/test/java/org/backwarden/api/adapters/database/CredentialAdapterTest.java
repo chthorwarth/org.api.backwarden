@@ -260,4 +260,59 @@ class CredentialAdapterTest {
                 () -> credentialAdapter.updateCredential(99999L, new Credential())
         );
     }
+
+    @Test
+    @Transactional
+    void getAllCredentials_shouldFilterByTitle()
+    {
+        User user = userAdapter.saveUser(createTestUser("filter@test.com"));
+        entityManager.flush();
+
+        vaultAdapter.saveVault(user.getId(), createTestVault("Vault"));
+        entityManager.flush();
+
+        long vaultId = entityManager
+                .createQuery("SELECT v.id FROM VaultEntity v", Long.class)
+                .getSingleResult();
+
+        credentialAdapter.saveCredential(createTestCredential("GitHub Account"), vaultId);
+        credentialAdapter.saveCredential(createTestCredential("Google Mail"), vaultId);
+        credentialAdapter.saveCredential(createTestCredential("GitLab CI"), vaultId);
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Credential> filtered = credentialAdapter.getAllCredentials(vaultId, "Git");
+
+        assertEquals(2, filtered.size());
+        assertTrue(filtered.stream().allMatch(
+                c -> c.getTitle().contains("Git")
+        ));
+    }
+
+
+    @Test
+    @Transactional
+    void getAllCredentials_shouldReturnEmptyList_whenNoTitleMatches()
+    {
+        User user = userAdapter.saveUser(createTestUser("nofilter@test.com"));
+        entityManager.flush();
+
+        vaultAdapter.saveVault(user.getId(), createTestVault("Vault"));
+        entityManager.flush();
+
+        long vaultId = entityManager
+                .createQuery("SELECT v.id FROM VaultEntity v", Long.class)
+                .getSingleResult();
+
+        credentialAdapter.saveCredential(createTestCredential("Facebook"), vaultId);
+        credentialAdapter.saveCredential(createTestCredential("Twitter"), vaultId);
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Credential> filtered = credentialAdapter.getAllCredentials(vaultId, "Git");
+
+        assertTrue(filtered.isEmpty());
+    }
+
+
 }
