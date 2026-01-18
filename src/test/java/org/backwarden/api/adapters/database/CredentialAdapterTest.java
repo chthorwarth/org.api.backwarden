@@ -158,7 +158,7 @@ class CredentialAdapterTest {
         entityManager.flush();
         entityManager.clear();
 
-        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId, 0, 10);
+        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId, "", 0, 10);
 
         assertEquals(2, credentials.size());
     }
@@ -176,15 +176,15 @@ class CredentialAdapterTest {
         entityManager.flush();
         entityManager.clear();
 
-        List<Credential> page0 = credentialAdapter.getAllCredentials(vaultId, 0, 2);
+        List<Credential> page0 = credentialAdapter.getAllCredentials(vaultId, "", 0, 2);
         assertEquals(2, page0.size(), "Page 0 should have 2 entries");
 
-        List<Credential> page1 = credentialAdapter.getAllCredentials(vaultId, 1, 2);
+        List<Credential> page1 = credentialAdapter.getAllCredentials(vaultId, "", 1, 2);
         assertEquals(2, page1.size(), "Page 1 should have 2 entries");
 
         assertNotEquals(page0.get(0).getId(), page1.get(0).getId());
 
-        List<Credential> page2 = credentialAdapter.getAllCredentials(vaultId, 2, 2);
+        List<Credential> page2 = credentialAdapter.getAllCredentials(vaultId, "", 2, 2);
         assertEquals(1, page2.size(), "Page 2 should have 1 entry");
     }
 
@@ -192,7 +192,8 @@ class CredentialAdapterTest {
     void getAllCredentials_shouldThrowNotFoundException_whenVaultDoesNotExist() {
         assertThrows(
                 NotFoundException.class,
-                () -> credentialAdapter.getAllCredentials(99999L, 0, 10)
+
+                () -> credentialAdapter.getAllCredentials(99999L, "", 0, 10)
         );
     }
 
@@ -208,7 +209,7 @@ class CredentialAdapterTest {
         credentialAdapter.saveCredential(createTestCredential("C"), vaultId);
         entityManager.flush();
 
-        long count = credentialAdapter.countCredentials(vaultId);
+        long count = credentialAdapter.countCredentials(vaultId, "");
 
         assertEquals(3, count);
     }
@@ -298,4 +299,59 @@ class CredentialAdapterTest {
                 () -> credentialAdapter.updateCredential(99999L, new Credential())
         );
     }
+
+    @Test
+    @Transactional
+    void getAllCredentials_shouldFilterByTitle()
+    {
+        User user = userAdapter.saveUser(createTestUser("filter@test.com"));
+        entityManager.flush();
+
+        vaultAdapter.saveVault(user.getId(), createTestVault("Vault"));
+        entityManager.flush();
+
+        long vaultId = entityManager
+                .createQuery("SELECT v.id FROM VaultEntity v", Long.class)
+                .getSingleResult();
+
+        credentialAdapter.saveCredential(createTestCredential("GitHub Account"), vaultId);
+        credentialAdapter.saveCredential(createTestCredential("Google Mail"), vaultId);
+        credentialAdapter.saveCredential(createTestCredential("GitLab CI"), vaultId);
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Credential> filtered = credentialAdapter.getAllCredentials(vaultId, "Git", 0, 10);
+
+        assertEquals(2, filtered.size());
+        assertTrue(filtered.stream().allMatch(
+                c -> c.getTitle().contains("Git")
+        ));
+    }
+
+
+    @Test
+    @Transactional
+    void getAllCredentials_shouldReturnEmptyList_whenNoTitleMatches()
+    {
+        User user = userAdapter.saveUser(createTestUser("nofilter@test.com"));
+        entityManager.flush();
+
+        vaultAdapter.saveVault(user.getId(), createTestVault("Vault"));
+        entityManager.flush();
+
+        long vaultId = entityManager
+                .createQuery("SELECT v.id FROM VaultEntity v", Long.class)
+                .getSingleResult();
+
+        credentialAdapter.saveCredential(createTestCredential("Facebook"), vaultId);
+        credentialAdapter.saveCredential(createTestCredential("Twitter"), vaultId);
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Credential> filtered = credentialAdapter.getAllCredentials(vaultId, "Git", 0, 10);
+
+        assertTrue(filtered.isEmpty());
+    }
+
+
 }

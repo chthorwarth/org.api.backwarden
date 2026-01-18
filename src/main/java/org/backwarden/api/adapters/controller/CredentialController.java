@@ -5,6 +5,7 @@ import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
@@ -91,7 +92,7 @@ public class CredentialController implements CredentialsApi {
     }
 
     @Override
-    public Response vaultsVaultIdCredentialsGet(Integer vaultId) {
+    public Response vaultsVaultIdCredentialsGet(Integer vaultId, @QueryParam("title") String title) {
         try {
             long currentUserId = Long.parseLong(identity.getPrincipal().getName());
             long userId = vaultService.getUserIdByVaultId(vaultId);
@@ -113,21 +114,19 @@ public class CredentialController implements CredentialsApi {
                 try { size = Integer.parseInt(sizeParam); } catch (NumberFormatException ignored) {}
             }
 
-            List<Credential> credentials = credentialService.getAllCredentials(vaultId, page, size);
+            long totalCount = credentialService.countCredentials(vaultId, title);
 
-            long totalCount = credentialService.countCredentials(vaultId);
+            CredentialWrapperDTO wrapperDTO = new CredentialWrapperDTO();
 
-            List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentials);
+            List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId,title, page, size));
 
-            for (CredentialDTO dto : credentialDTOs) {
+            for (CredentialDTO dto : credentialDTOs)
                 dto.setSelfLink(uriInfo.getBaseUriBuilder()
                         .path("/vaults/{vaultid}/credentials/{credentialid}")
                         .resolveTemplate("vaultid", vaultId)
                         .resolveTemplate("credentialid", dto.getId())
                         .build());
-            }
 
-            CredentialWrapperDTO wrapperDTO = new CredentialWrapperDTO();
             wrapperDTO.credentialDTOS(credentialDTOs);
 
             wrapperDTO.setSelfLink(createPaginationUri(page, size, vaultId));
