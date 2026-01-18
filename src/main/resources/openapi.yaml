@@ -168,6 +168,19 @@ paths:
     get:
       tags: [ Credentials ]
       summary: Get all credentials in a vault (Wrapped)
+      description: >
+        Returns all credentials stored in the specified vault.
+        Optionally filters credentials by title using a case-insensitive
+        partial match.
+      parameters:
+        - name: title
+          in: query
+          required: false
+          description: >
+            Filters credentials by title. Matches all credentials whose
+            title contains the given value (case-insensitive).
+          schema:
+            type: string
       responses:
         '200':
           description: OK
