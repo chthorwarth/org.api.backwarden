@@ -1,4 +1,4 @@
-package org.backwarden.api.adapters.controller;
+package org.backwarden.api.adapters.controller.helper;
 
 import jakarta.ws.rs.core.UriInfo;
 
@@ -124,6 +124,15 @@ public class LinkHelper {
                 .path("vaults/{vaultid}/credentials/{credentialid}")
                 .resolveTemplate("vaultid", vaultid)
                 .resolveTemplate("credentialid", credentialid)
+                .build();
+    }
+
+    public static URI createPaginationUri(UriInfo uriInfo, int page, int size, Integer vaultId) {
+        return uriInfo.getBaseUriBuilder()
+                .path("/vaults/{vaultid}/credentials")
+                .resolveTemplate("vaultid", vaultId)
+                .queryParam("page", page)
+                .queryParam("size", size)
                 .build();
     }
 

@@ -15,8 +15,9 @@ import org.openapitools.model.VaultDTO;
 import org.openapitools.model.VaultUpdateDTO;
 import org.openapitools.model.VaultWrapperDTO;
 
-import static org.backwarden.api.adapters.controller.LinkHelper.*;
-import static org.backwarden.api.adapters.controller.CacheControlHelper.*;
+import static org.backwarden.api.adapters.controller.helper.LinkHelper.*;
+import static org.backwarden.api.adapters.controller.helper.CacheControlHelper.*;
+import static org.backwarden.api.adapters.controller.helper.AuthenticationHelper.*;
 
 import java.util.List;
 
@@ -38,22 +39,14 @@ public class VaultController implements VaultsApi {
 
     @Override
     public Response createUserVault(Integer userId, VaultCreationDTO vaultCreationDTO) {
-        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-
-        if (currentUserId != userId) {
-            throw new ForbiddenException("Not your account");
-        }
+        assertUserHasAccessToResource(identity, userId);
         long vaultid = vaultService.createVault(userId, VaultDTOConverter.fromDTO(vaultCreationDTO));
         return Response.created(uriInfo.getBaseUriBuilder().path("/users/{userid}/vaults/{vaultid}").resolveTemplate("userid", userId).resolveTemplate("vaultid", vaultid).build()).cacheControl(notStore()).build();
     }
 
     @Override
     public Response deleteUserVault(Integer userId, Integer vaultId) {
-        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-
-        if (currentUserId != userId) {
-            throw new ForbiddenException("Not your account");
-        }
+        assertUserHasAccessToResource(identity, userId);
         Vault vault = vaultService.getVault(vaultId);
         EntityTag etag = new EntityTag(Integer.toString(vault.hashCode()));
         Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
@@ -66,11 +59,7 @@ public class VaultController implements VaultsApi {
 
     @Override
     public Response getUserVaultById(Integer userId, Integer vaultId) {
-        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-
-        if (currentUserId != userId) {
-            throw new ForbiddenException("Not your account");
-        }
+        assertUserHasAccessToResource(identity, userId);
         Vault vault = null;
         try {
             vault = vaultService.getVault(vaultId);
@@ -85,16 +74,12 @@ public class VaultController implements VaultsApi {
             return Response.notModified().build();
         }
 
-        return Response.ok(vaultDTO).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).link(deleteVault(uriInfo, userId, vaultId), relNameDeleteVault).link(getAllVaults(uriInfo, currentUserId), relNameGetAllVaults).link(updateVault(uriInfo, currentUserId, vaultId), relNameUpdateVault).tag(etag).cacheControl(cachePrivateMustRevalidate()).build();
+        return Response.ok(vaultDTO).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).link(deleteVault(uriInfo, userId, vaultId), relNameDeleteVault).link(getAllVaults(uriInfo, userId), relNameGetAllVaults).link(updateVault(uriInfo, userId, vaultId), relNameUpdateVault).tag(etag).cacheControl(cachePrivateMustRevalidate()).build();
     }
 
     @Override
     public Response listUserVaults(Integer userId) {
-        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-
-        if (currentUserId != userId) {
-            throw new ForbiddenException("Not your account");
-        }
+        assertUserHasAccessToResource(identity, userId);
         VaultWrapperDTO vaultWrapperDTO = new VaultWrapperDTO();
         List<VaultDTO> vaultDTOS = VaultDTOConverter.toDTOList(vaultService.getAllVaults(userId));
 
@@ -116,11 +101,7 @@ public class VaultController implements VaultsApi {
 
     @Override
     public Response updateUserVault(Integer userId, Integer vaultId, VaultUpdateDTO vaultUpdateDTO) {
-        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-
-        if (currentUserId != userId) {
-            throw new ForbiddenException("Not your account");
-        }
+        assertUserHasAccessToResource(identity, userId);
         Vault vault = null;
         try {
             vault = vaultService.getVault(vaultId);

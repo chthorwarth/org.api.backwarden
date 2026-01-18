@@ -1,27 +1,21 @@
 package org.backwarden.api.adapters.controller;
 
-import io.smallrye.jwt.build.Jwt;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import org.backwarden.api.logic.JwtKeyGenerator;
-import org.backwarden.api.logic.exceptions.DomainValidationException;
 import org.backwarden.api.logic.exceptions.UserNotFoundException;
 import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.ports.input.UserUseCase;
 import org.openapitools.model.LoginRequest;
 
-import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.time.Duration;
-import java.util.Set;
 
-import static org.backwarden.api.adapters.controller.CacheControlHelper.*;
-import static org.backwarden.api.adapters.controller.LinkHelper.*;
+import static org.backwarden.api.adapters.controller.helper.CacheControlHelper.*;
+import static org.backwarden.api.adapters.controller.helper.LinkHelper.*;
 
 @Path("/token")
 @Consumes(MediaType.APPLICATION_JSON)

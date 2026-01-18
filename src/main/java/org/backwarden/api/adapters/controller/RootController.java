@@ -3,8 +3,8 @@ package org.backwarden.api.adapters.controller;
 import jakarta.ws.rs.core.*;
 import org.openapitools.api.RootApi;
 
-import static org.backwarden.api.adapters.controller.LinkHelper.*;
-import static org.backwarden.api.adapters.controller.CacheControlHelper.*;
+import static org.backwarden.api.adapters.controller.helper.LinkHelper.*;
+import static org.backwarden.api.adapters.controller.helper.CacheControlHelper.*;
 
 public class RootController implements RootApi {
 

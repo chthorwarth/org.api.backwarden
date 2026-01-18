@@ -3,8 +3,6 @@ package org.backwarden.api.adapters.controller;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.*;
 import org.backwarden.api.adapters.controller.model.converter.UserDTOConverter;
@@ -18,9 +16,10 @@ import org.openapitools.model.UserRegistrationDTO;
 
 import java.net.URI;
 
-import static org.backwarden.api.adapters.controller.CacheControlHelper.*;
+import static org.backwarden.api.adapters.controller.helper.CacheControlHelper.*;
+import static org.backwarden.api.adapters.controller.helper.AuthenticationHelper.*;
 
-import static org.backwarden.api.adapters.controller.LinkHelper.*;
+import static org.backwarden.api.adapters.controller.helper.LinkHelper.*;
 
 @ApplicationScoped
 public class UserController implements UsersApi {
@@ -58,11 +57,7 @@ public class UserController implements UsersApi {
 
     @Override
     public Response getUserById(Integer userId) {
-        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-
-        if (currentUserId != userId) {
-            throw new ForbiddenException("Not your account");
-        }
+        assertUserHasAccessToResource(identity, userId);
 
         User user = userService.getUser(userId);
         UserDTO dto = UserDTOConverter.toDTO(user);

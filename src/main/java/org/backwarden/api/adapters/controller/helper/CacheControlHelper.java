@@ -1,4 +1,4 @@
-package org.backwarden.api.adapters.controller;
+package org.backwarden.api.adapters.controller.helper;
 
 import jakarta.ws.rs.core.CacheControl;
 
