@@ -52,7 +52,6 @@ class VaultEntityConverterTest {
         assertNotNull(entity.getCredentials());
         assertEquals(vault.getCredentials().size(), entity.getCredentials().size());
 
-        // Prüfe erste Credential
         CredentialEntity cEntity = entity.getCredentials().get(0);
         assertEquals("C1", cEntity.getTitle());
     }
@@ -71,7 +70,6 @@ class VaultEntityConverterTest {
         assertEquals(user, converted.getUser());
         assertEquals(entity.getCredentials().size(), converted.getCredentials().size());
 
-        // Prüfe erste Credential
         assertEquals("C1", converted.getCredentials().get(0).getTitle());
     }
 

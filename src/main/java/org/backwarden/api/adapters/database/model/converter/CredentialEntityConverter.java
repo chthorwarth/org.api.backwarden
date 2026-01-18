@@ -16,7 +16,7 @@ public class CredentialEntityConverter {
         credentialEntity.setTitle(credential.getTitle());
         credentialEntity.setPasswordCiphertext(credential.getPasswordCiphertext());
         credentialEntity.setPasswordIV(credential.getPasswordIV());
-        credentialEntity.setVault(null); //mapping results in endless loop
+        credentialEntity.setVault(null);
         return credentialEntity;
     }
 
@@ -30,7 +30,7 @@ public class CredentialEntityConverter {
         credential.setPasswordCiphertext(credentialEntity.getPasswordCiphertext());
         credential.setPasswordIV(credentialEntity.getPasswordIV());
 
-        credential.setVault(vault); //mapping results in endless loop
+        credential.setVault(vault);
 
         return credential;
     }

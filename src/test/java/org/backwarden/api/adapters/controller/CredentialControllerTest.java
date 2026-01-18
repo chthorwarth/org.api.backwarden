@@ -195,7 +195,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         long vaultId = createVault(token, userId);
         long credId = createCredential(token, vaultId, getCredentialDTO());
 
-        // Erster Request → ETag holen
+        // First Request → get ETag
         String etag =
                 given()
                         .auth().oauth2(token)
@@ -206,7 +206,7 @@ public class CredentialControllerTest extends BaseControllerTest {
                         .extract()
                         .header("ETag");
 
-        // Conditional GET mit If-None-Match
+        // Second request Conditional GET with If-None-Match
         given()
                 .auth().oauth2(token)
                 .header("If-None-Match", etag)
@@ -425,7 +425,7 @@ public class CredentialControllerTest extends BaseControllerTest {
         long vaultId = createVault(token, userId);
         long credentialId = createCredential(token, vaultId, getCredentialDTO());
 
-        // ETag vom GET holen
+        //  GET ETag from Vault
         String etag =
                 given()
                         .auth().oauth2(token)
@@ -452,7 +452,6 @@ public class CredentialControllerTest extends BaseControllerTest {
                         .put("/vaults/" + vaultId + "/credentials/" + credentialId)
                         .then()
                         .statusCode(204)
-                        // du baust: Response.noContent().link(getOneCredential(...), relNameGetOneCredential)...
                         .extract()
                         .headers()
                         .getValues("Link");

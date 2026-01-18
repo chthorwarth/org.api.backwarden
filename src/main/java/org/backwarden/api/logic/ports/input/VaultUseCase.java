@@ -7,7 +7,6 @@ import java.util.List;
 public interface VaultUseCase {
     public long createVault(long userId, Vault vault);
 
-    //public Vault getVault(long id);
 
     public void updateVault(long id, Vault vault);
 

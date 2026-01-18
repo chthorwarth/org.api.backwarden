@@ -5,11 +5,8 @@ import org.backwarden.api.logic.model.Vault;
 
 import java.util.List;
 
-public interface VaultRepository
-{
+public interface VaultRepository {
     public Vault saveVault(long userId, Vault vault);
-
-    //public Vault getVault(long id);
 
     public void updateVault(long id, Vault vault);
 

@@ -1,4 +1,5 @@
 package org.backwarden.api.adapters.database.model;
+
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -23,15 +24,17 @@ public class VaultEntity {
     private List<CredentialEntity> credentials = new ArrayList<>();
     private boolean autoFill;
 
-    /** Adds a credential and keeps the bidirectional Vault–Credential relationship in sync. **/
-    // TODO write a test for this
+    /**
+     * Adds a credential and keeps the bidirectional Vault–Credential relationship in sync.
+     **/
     public void addCredential(CredentialEntity credential) {
         credentials.add(credential);
         credential.setVault(this);
     }
 
-    /** Removes a credential and keeps the bidirectional Vault-Credential relationship in sync **/
-    // TODO write a test for this
+    /**
+     * Removes a credential and keeps the bidirectional Vault-Credential relationship in sync
+     **/
     public void removeCredential(CredentialEntity credential) {
         credentials.remove(credential);
         credential.setVault(null);

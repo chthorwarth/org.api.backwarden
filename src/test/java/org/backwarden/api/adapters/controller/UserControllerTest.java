@@ -78,7 +78,7 @@ public class UserControllerTest extends BaseControllerTest {
 
         UserRegistrationDTO req = new UserRegistrationDTO();
         req.masterEmail("valid@test.de");
-        req.masterPassword("abc"); // bewusst zu schwach
+        req.masterPassword("abc"); // intentional weak
 
         given()
                 .contentType("application/json")
@@ -116,7 +116,7 @@ public class UserControllerTest extends BaseControllerTest {
         register("b@test.de", "Strong#12345");
         String jwtB = token("b@test.de", "Strong#12345");
 
-        // B versucht A zu lesen
+        // B tries to read A
         given()
                 .auth().oauth2(jwtB)
                 .when()

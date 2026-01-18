@@ -42,7 +42,6 @@ class CredentialEntityConverterTest {
         assertEquals(credential.getPasswordCiphertext(), entity.getPasswordCiphertext());
         assertEquals(credential.getPasswordIV(), entity.getPasswordIV());
 
-        // Vault sollte null sein (um Endlosschleife zu vermeiden)
         assertNull(entity.getVault());
     }
 
@@ -67,7 +66,6 @@ class CredentialEntityConverterTest {
         assertEquals(entity.getPasswordCiphertext(), credential.getPasswordCiphertext());
         assertEquals(entity.getPasswordIV(), credential.getPasswordIV());
 
-        // Vault muss korrekt gesetzt sein
         assertNotNull(credential.getVault());
         assertEquals(vault.getId(), credential.getVault().getId());
     }
@@ -79,7 +77,7 @@ class CredentialEntityConverterTest {
 
         assertEquals(credentials.size(), entities.size());
         assertEquals(credentials.get(0).getTitle(), entities.get(0).getTitle());
-        assertNull(entities.get(0).getVault()); // Vault bleibt null
+        assertNull(entities.get(0).getVault());
     }
 
     @Test
@@ -99,7 +97,6 @@ class CredentialEntityConverterTest {
         assertEquals("Login1", credentials.get(0).getTitle());
         assertEquals("Login2", credentials.get(1).getTitle());
 
-        // Vault muss korrekt gesetzt sein
         assertEquals(vault.getId(), credentials.get(0).getVault().getId());
         assertEquals(vault.getId(), credentials.get(1).getVault().getId());
     }

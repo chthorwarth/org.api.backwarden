@@ -45,7 +45,6 @@ class UserEntityConverterTest {
         assertEquals(user.getFailedLoginAttempts(), entity.getFailedLoginAttempts());
         assertEquals(user.getLockedUntil(), entity.getLockedUntil());
 
-        // Vaults werden aktuell in toEntity auskommentiert, daher prüfen wir nur, dass entity.getVaults() null oder leer ist
         assertTrue(entity.getVaults() == null || entity.getVaults().isEmpty());
     }
 
@@ -59,7 +58,6 @@ class UserEntityConverterTest {
         entity.setFailedLoginAttempts(2);
         entity.setLockedUntil(LocalDateTime.now().plusDays(1).toInstant(ZoneOffset.MIN));
 
-        // Simuliere VaultEntities
         Vault vault1 = new Vault();
         vault1.setId(100L);
         vault1.setTitle("Vault1");
@@ -78,32 +76,9 @@ class UserEntityConverterTest {
         assertEquals(entity.getFailedLoginAttempts(), user.getFailedLoginAttempts());
         assertEquals(entity.getLockedUntil(), user.getLockedUntil());
 
-        // Vaults prüfen
         assertNotNull(user.getVaults());
         assertEquals(2, user.getVaults().size());
         assertEquals("Vault1", user.getVaults().get(0).getTitle());
         assertEquals("Vault2", user.getVaults().get(1).getTitle());
     }
-
-    /*
-    // Wenn die Methoden toEntityList / fromEntityList wieder aktiviert werden:
-    @Test
-    void toEntityList() {
-        List<User> users = List.of(createTestUser(), createTestUser());
-        List<UserEntity> entities = UserEntityConverter.toEntityList(users);
-
-        assertEquals(users.size(), entities.size());
-        assertEquals(users.get(0).getId(), entities.get(0).getId());
-    }
-
-    @Test
-    void fromEntityList() {
-        List<User> users = List.of(createTestUser(), createTestUser());
-        List<UserEntity> entities = UserEntityConverter.toEntityList(users);
-        List<User> converted = UserEntityConverter.fromEntityList(entities);
-
-        assertEquals(users.size(), converted.size());
-        assertEquals(users.get(0).getMasterEmail(), converted.get(0).getMasterEmail());
-    }
-    */
 }

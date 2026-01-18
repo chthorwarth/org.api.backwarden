@@ -125,7 +125,7 @@ public class VaultControllerTest extends BaseControllerTest {
         long userid = register("me@test.de", "Strong#12345");
         String token = token("me@test.de", "Strong#12345");
 
-        // Vault erstellen
+        // create Vault
         VaultCreationDTO dto = new VaultCreationDTO();
         dto.setTitle("Delete me");
         dto.setAutoFill(false);
@@ -230,7 +230,7 @@ public class VaultControllerTest extends BaseControllerTest {
         long userId = register("etag2@test.de", "Strong#12345");
         String token = token("etag2@test.de", "Strong#12345");
 
-        // erster Request → ETag holen
+        // First Request → get ETag
         String etag =
                 given()
                         .auth().oauth2(token)
@@ -241,7 +241,7 @@ public class VaultControllerTest extends BaseControllerTest {
                         .extract()
                         .header("ETag");
 
-        // zweiter Request mit If-None-Match
+        // Second Request test If-None-Match
         given()
                 .auth().oauth2(token)
                 .header("If-None-Match", etag)
@@ -288,7 +288,7 @@ public class VaultControllerTest extends BaseControllerTest {
                         .extract()
                         .header("ETag");
 
-        // neue Vault anlegen
+        // POST Vault
         given()
                 .auth().oauth2(token)
                 .contentType(ContentType.JSON)

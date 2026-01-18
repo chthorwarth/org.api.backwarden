@@ -51,7 +51,7 @@ class CryptoHelperTest {
         CryptoHelper.Encrypted e1 = CryptoHelper.encrypt(plaintext, key);
         CryptoHelper.Encrypted e2 = CryptoHelper.encrypt(plaintext, key);
 
-        assertNotEquals(e1.ciphertext(), e2.ciphertext()); // wegen unterschiedlichem IV
+        assertNotEquals(e1.ciphertext(), e2.ciphertext()); // because of different IV
         assertNotEquals(e1.iv(), e2.iv());
     }
 
@@ -88,9 +88,9 @@ class CryptoHelperTest {
         CryptoHelper.Encrypted encrypted =
                 CryptoHelper.encrypt("secret", key);
 
-        // Ciphertext manipulieren
+        // manipulate Ciphertext
         byte[] cipher = Base64.getDecoder().decode(encrypted.ciphertext());
-        cipher[0] ^= 0x01; // ein Bit flippen
+        cipher[0] ^= 0x01; // flip a bit
         String modifiedCipher = Base64.getEncoder().encodeToString(cipher);
 
         assertThrows(Exception.class, () ->

@@ -40,7 +40,6 @@ public class UserService implements UserUseCase {
         SecureRandom random = new SecureRandom();
         random.nextBytes(kdfSalt);
 
-        // Base64-kodiert speichern, wenn nötig
         return Base64.getEncoder().encodeToString(kdfSalt);
     }
 
@@ -65,11 +64,10 @@ public class UserService implements UserUseCase {
         if (ValidationHelper.isMailValid(user.getMasterEmail()) && ValidationHelper.isPasswordValid(user.getMasterPassword(), user.getMasterEmail())) {
             String passwordHash = getPasswordHash(user.getMasterPassword());
 
-            // 3. User-Objekt erstellen und in DB speichern
             String kdfSalt = generateKDFSalt();
             user.setMasterPasswordSalt(kdfSalt);
 
-            user.setMasterPasswordHash(passwordHash); // Speichere NUR den Hash
+            user.setMasterPasswordHash(passwordHash); // Only save the hashed pw
             return userRepository.saveUser(user).getId();
         } else {
             throw new DomainValidationException("Invalid email or password");

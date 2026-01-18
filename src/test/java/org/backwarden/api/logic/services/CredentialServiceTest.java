@@ -98,7 +98,7 @@ class CredentialServiceTest {
         SecretKey key = newAesKey();
 
         Credential c = new Credential();
-        // gültiges Base64, aber inhaltlich "falsche" Bytes -> decrypt sollte fehlschlagen
+        // valid Base64, but "wrong" bytes in context -> decrypt should fail
         c.setPasswordIV(base64RandomBytes(12));
         c.setPasswordCiphertext(base64RandomBytes(64));
 

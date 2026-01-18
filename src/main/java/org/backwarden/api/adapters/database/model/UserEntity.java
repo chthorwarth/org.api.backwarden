@@ -26,15 +26,17 @@ public class UserEntity {
     private List<VaultEntity> vaults = new ArrayList<>();
 
 
-    /** Adds a vault and keeps the bidirectional User–Vault relationship in sync. **/
-    // TODO write a test for this
+    /**
+     * Adds a vault and keeps the bidirectional User–Vault relationship in sync.
+     **/
     public void addVault(VaultEntity vault) {
         vaults.add(vault);
         vault.setUser(this);
     }
 
-    /** Removes a vault and keeps the bidirectional User-Vault relationship in sync **/
-    // TODO write a test for this
+    /**
+     * Removes a vault and keeps the bidirectional User-Vault relationship in sync
+     **/
     public void removeVault(VaultEntity vault) {
         vaults.remove(vault);
         vault.setUser(null);

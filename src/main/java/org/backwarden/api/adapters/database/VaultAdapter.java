@@ -50,12 +50,7 @@ public class VaultAdapter implements VaultRepository {
         if (managedVault == null) {
             throw new NotFoundException("Vault with id " + id + " not found");
         }
-
-        //if (vault.getTitle() != null && !vault.getTitle().isEmpty())
         managedVault.setTitle(vault.getTitle());
-
-        // We have to check for null, because the field is nullable in the database
-        //if (vault.isAutoFill())
         managedVault.setAutoFill(vault.isAutoFill());
     }
 
