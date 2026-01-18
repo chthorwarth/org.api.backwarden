@@ -107,7 +107,11 @@ public class VaultController implements VaultsApi {
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-
+        EntityTag etag = new EntityTag(Integer.toString(vault.hashCode()));
+        Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
+        if (builder != null) {
+            return builder.build();
+        }
         vaultUseCase.updateVault(vaultId, VaultDTOConverter.fromDTO(vaultUpdateDTO));
         return Response.noContent().link(getOneVault(uriInfo, userId, vaultId), relNameGetOneVault).cacheControl(notStore()).build();
     }
