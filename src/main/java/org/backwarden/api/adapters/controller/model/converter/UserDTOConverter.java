@@ -16,13 +16,6 @@ public class UserDTOConverter {
         return userDTO;
     }
 
-    public static User fromDTO(UserDTO userDTO) {
-        User user = new User();
-        user.setMasterEmail(userDTO.getMasterEmail());
-        user.setFailedLoginAttempts(userDTO.getFailedLoginAttempts());
-        return user;
-    }
-
     public static User fromDTO(UserRegistrationDTO userRegistrationDTO) {
         User user = new User();
         user.setMasterEmail(userRegistrationDTO.getMasterEmail());
