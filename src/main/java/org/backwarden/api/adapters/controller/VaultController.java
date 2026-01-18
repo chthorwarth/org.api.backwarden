@@ -3,7 +3,6 @@ package org.backwarden.api.adapters.controller;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.*;
 import org.backwarden.api.adapters.controller.model.converter.VaultDTOConverter;
@@ -26,7 +25,7 @@ import java.util.List;
 public class VaultController implements VaultsApi {
 
     @Inject
-    VaultUseCase vaultService;
+    VaultUseCase vaultUseCase;
 
     @Inject
     SecurityIdentity identity;
@@ -40,20 +39,20 @@ public class VaultController implements VaultsApi {
     @Override
     public Response createUserVault(Integer userId, VaultCreationDTO vaultCreationDTO) {
         assertUserHasAccessToResource(identity, userId);
-        long vaultid = vaultService.createVault(userId, VaultDTOConverter.fromDTO(vaultCreationDTO));
+        long vaultid = vaultUseCase.createVault(userId, VaultDTOConverter.fromDTO(vaultCreationDTO));
         return Response.created(uriInfo.getBaseUriBuilder().path("/users/{userid}/vaults/{vaultid}").resolveTemplate("userid", userId).resolveTemplate("vaultid", vaultid).build()).cacheControl(notStore()).build();
     }
 
     @Override
     public Response deleteUserVault(Integer userId, Integer vaultId) {
         assertUserHasAccessToResource(identity, userId);
-        Vault vault = vaultService.getVault(vaultId);
+        Vault vault = vaultUseCase.getVault(vaultId);
         EntityTag etag = new EntityTag(Integer.toString(vault.hashCode()));
         Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
         if (builder != null) {
             return builder.build();
         }
-        vaultService.deleteVault(vaultId);
+        vaultUseCase.deleteVault(vaultId);
         return Response.noContent().link(getAllVaults(uriInfo, userId), relNameGetAllVaults).cacheControl(notStore()).build();
     }
 
@@ -62,7 +61,7 @@ public class VaultController implements VaultsApi {
         assertUserHasAccessToResource(identity, userId);
         Vault vault = null;
         try {
-            vault = vaultService.getVault(vaultId);
+            vault = vaultUseCase.getVault(vaultId);
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -81,7 +80,7 @@ public class VaultController implements VaultsApi {
     public Response listUserVaults(Integer userId) {
         assertUserHasAccessToResource(identity, userId);
         VaultWrapperDTO vaultWrapperDTO = new VaultWrapperDTO();
-        List<VaultDTO> vaultDTOS = VaultDTOConverter.toDTOList(vaultService.getAllVaults(userId));
+        List<VaultDTO> vaultDTOS = VaultDTOConverter.toDTOList(vaultUseCase.getAllVaults(userId));
 
         for (VaultDTO vaultDTO : vaultDTOS) {
             vaultDTO.setSelfLink(
@@ -104,16 +103,12 @@ public class VaultController implements VaultsApi {
         assertUserHasAccessToResource(identity, userId);
         Vault vault = null;
         try {
-            vault = vaultService.getVault(vaultId);
+            vault = vaultUseCase.getVault(vaultId);
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        EntityTag etag = new EntityTag(Integer.toString(vault.hashCode()));
-        Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
-        if (builder != null) {
-            return builder.build();
-        }
-        vaultService.updateVault(vaultId, VaultDTOConverter.fromDTO(vaultUpdateDTO));
+
+        vaultUseCase.updateVault(vaultId, VaultDTOConverter.fromDTO(vaultUpdateDTO));
         return Response.noContent().link(getOneVault(uriInfo, userId, vaultId), relNameGetOneVault).cacheControl(notStore()).build();
     }
 }

@@ -12,27 +12,27 @@ import java.util.NoSuchElementException;
 @ApplicationScoped
 public class VaultService implements VaultUseCase {
     @Inject
-    VaultRepository vaultAdapter;
+    VaultRepository vaultRepository;
 
     @Override
     public long createVault(long userId, Vault vault) {
-        Vault vault1 = vaultAdapter.saveVault(userId, vault);
+        Vault vault1 = vaultRepository.saveVault(userId, vault);
         return vault1.getId();
     }
 
     @Override
     public void updateVault(long id, Vault vault) {
-        vaultAdapter.updateVault(id, vault);
+        vaultRepository.updateVault(id, vault);
     }
 
     @Override
     public void deleteVault(long id) {
-        vaultAdapter.deleteVault(id);
+        vaultRepository.deleteVault(id);
     }
 
     @Override
     public List<Vault> getAllVaults(long userId) {
-        return vaultAdapter.getAllVaults(userId);
+        return vaultRepository.getAllVaults(userId);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class VaultService implements VaultUseCase {
 
     @Override
     public Vault getVault(long vaultId) {
-        Vault vault = vaultAdapter.getVault(vaultId);
+        Vault vault = vaultRepository.getVault(vaultId);
         if (vault == null)
             throw new NoSuchElementException();
         return vault;

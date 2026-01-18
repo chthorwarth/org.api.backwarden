@@ -23,7 +23,7 @@ import static org.backwarden.api.adapters.controller.helper.LinkHelper.*;
 public class TokenController {
 
     @Inject
-    UserUseCase userService;
+    UserUseCase userUseCase;
 
     @Context
     UriInfo uriInfo;
@@ -37,8 +37,8 @@ public class TokenController {
         User user;
         String token;
         try {
-            user = userService.authenticate(request.getEmail(), request.getPassword());
-            token = userService.generateJWTandKDF(user, request.getPassword());
+            user = userUseCase.authenticate(request.getEmail(), request.getPassword());
+            token = userUseCase.generateJWTandKDF(user, request.getPassword());
         } catch (UserNotFoundException e) {
             throw new NotAuthorizedException("Invalid credentials");
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {

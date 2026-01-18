@@ -19,7 +19,7 @@ import java.util.List;
 public class CredentialService implements CredentialUseCase {
     private static final Logger log = LoggerFactory.getLogger(CredentialService.class);
     @Inject
-    CredentialRepository credentialAdapter;
+    CredentialRepository credentialRepository;
 
     @Inject
     JsonWebToken jwt;
@@ -33,13 +33,13 @@ public class CredentialService implements CredentialUseCase {
         SecretKey secretKey = sessionKeyStore.get(sessionId);
         encrypt(credential, secretKey);
         credential.setPassword(null);
-        Credential credential1 = credentialAdapter.saveCredential(credential, vaultId);
+        Credential credential1 = credentialRepository.saveCredential(credential, vaultId);
         return credential1.getId();
     }
 
     @Override
     public Credential getCredential(long id) {
-        Credential credential = credentialAdapter.getCredential(id);
+        Credential credential = credentialRepository.getCredential(id);
         String sessionId = jwt.getClaim("sid");
         SecretKey secretKey = sessionKeyStore.get(sessionId);
         decryptCredential(credential, secretKey);
@@ -52,7 +52,7 @@ public class CredentialService implements CredentialUseCase {
         String sessionId = jwt.getClaim("sid");
         SecretKey secretKey = sessionKeyStore.get(sessionId);
         List<Credential> credentials =
-                credentialAdapter.getAllCredentials(vaultId, title, page, size);
+                credentialRepository.getAllCredentials(vaultId, title, page, size);
         for (Credential credential : credentials) {
             decryptCredential(credential, secretKey);
         }
@@ -80,7 +80,7 @@ public class CredentialService implements CredentialUseCase {
     @Override
     @Transactional
     public void deleteCredential(long id) {
-        credentialAdapter.deleteCredential(id);
+        credentialRepository.deleteCredential(id);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class CredentialService implements CredentialUseCase {
         SecretKey secretKey = sessionKeyStore.get(sessionId);
         encrypt(credential, secretKey);
         credential.setPassword(null);
-        credentialAdapter.updateCredential(id, credential);
+        credentialRepository.updateCredential(id, credential);
     }
 
     private void encrypt(Credential credential, SecretKey secretKey) {
@@ -108,6 +108,6 @@ public class CredentialService implements CredentialUseCase {
 
     @Override
     public long countCredentials(long vaultId, String title) {
-        return credentialAdapter.countCredentials(vaultId, title);
+        return credentialRepository.countCredentials(vaultId, title);
     }
 }

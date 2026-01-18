@@ -3,7 +3,6 @@ package org.backwarden.api.adapters.controller;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.*;
 import org.backwarden.api.adapters.controller.model.converter.UserDTOConverter;
 import org.backwarden.api.logic.exceptions.DomainValidationException;
@@ -24,7 +23,7 @@ import static org.backwarden.api.adapters.controller.helper.LinkHelper.*;
 @ApplicationScoped
 public class UserController implements UsersApi {
     @Inject
-    UserUseCase userService;
+    UserUseCase userUseCase;
 
     @Context
     UriInfo uriInfo;
@@ -38,7 +37,7 @@ public class UserController implements UsersApi {
     @Override
     public Response createUser(UserRegistrationDTO userRegistrationDTO) {
         try {
-            long id = userService.createUser(UserDTOConverter.fromDTO(userRegistrationDTO));
+            long id = userUseCase.createUser(UserDTOConverter.fromDTO(userRegistrationDTO));
             URI location = uriInfo
                     .getAbsolutePathBuilder()
                     .path(String.valueOf(id))
@@ -59,7 +58,7 @@ public class UserController implements UsersApi {
     public Response getUserById(Integer userId) {
         assertUserHasAccessToResource(identity, userId);
 
-        User user = userService.getUser(userId);
+        User user = userUseCase.getUser(userId);
         UserDTO dto = UserDTOConverter.toDTO(user);
         EntityTag etag = new EntityTag(Integer.toString(user.hashCode()));
         Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
