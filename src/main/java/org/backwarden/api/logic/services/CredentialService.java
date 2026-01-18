@@ -31,17 +31,8 @@ public class CredentialService implements CredentialUseCase {
     public long createCredentials(Credential credential, long vaultId) {
         String sessionId = jwt.getClaim("sid");
         SecretKey secretKey = sessionKeyStore.get(sessionId);
-        if (secretKey == null) {
-            throw new SecurityException("Session expired — login again");
-        }
-        CryptoHelper.Encrypted encrypted = null;
-        try {
-            encrypted = CryptoHelper.encrypt(credential.getPassword(), secretKey);
-        } catch (Exception e) {
-            throw new CryptionGoneWrongException("Unkown Error while encrypting credential password");
-        }
-        credential.setPasswordCiphertext(encrypted.ciphertext());
-        credential.setPasswordIV(encrypted.iv());
+        encrypt(credential, secretKey);
+        credential.setPassword(null);
         Credential credential1 = credentialAdapter.saveCredential(credential, vaultId);
         return credential1.getId();
     }
@@ -49,23 +40,25 @@ public class CredentialService implements CredentialUseCase {
     @Override
     public Credential getCredential(long id) {
         Credential credential = credentialAdapter.getCredential(id);
-        decryptCredential(credential);
+        String sessionId = jwt.getClaim("sid");
+        SecretKey secretKey = sessionKeyStore.get(sessionId);
+        decryptCredential(credential, secretKey);
         credential.setPasswordSecure(ValidationHelper.isPasswordValid(credential.getPassword(), credential.getUsername()));
         return credential;
     }
 
     @Override
     public List<Credential> getAllCredentials(long vaultId) {
+        String sessionId = jwt.getClaim("sid");
+        SecretKey secretKey = sessionKeyStore.get(sessionId);
         List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId);
         for (Credential credential : credentials) {
-            decryptCredential(credential);
+            decryptCredential(credential, secretKey);
         }
         return credentials;
     }
 
-    void decryptCredential(Credential credential) {
-        String sessionId = jwt.getClaim("sid");
-        SecretKey secretKey = sessionKeyStore.get(sessionId);
+    void decryptCredential(Credential credential, SecretKey secretKey) {
         if (secretKey == null) {
             throw new SecurityException("Session expired — login again");
         }
@@ -91,6 +84,24 @@ public class CredentialService implements CredentialUseCase {
 
     @Override
     public void updateCredential(long id, Credential credential) {
+        String sessionId = jwt.getClaim("sid");
+        SecretKey secretKey = sessionKeyStore.get(sessionId);
+        encrypt(credential, secretKey);
+        credential.setPassword(null);
         credentialAdapter.updateCredential(id, credential);
+    }
+
+    private void encrypt(Credential credential, SecretKey secretKey) {
+        if (secretKey == null) {
+            throw new SecurityException("Session expired — login again");
+        }
+        CryptoHelper.Encrypted encrypted = null;
+        try {
+            encrypted = CryptoHelper.encrypt(credential.getPassword(), secretKey);
+        } catch (Exception e) {
+            throw new CryptionGoneWrongException("Unkown Error while encrypting credential password");
+        }
+        credential.setPasswordCiphertext(encrypted.ciphertext());
+        credential.setPasswordIV(encrypted.iv());
     }
 }

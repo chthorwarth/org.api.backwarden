@@ -5,11 +5,11 @@ import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.*;
 import org.backwarden.api.adapters.controller.model.converter.CredentialDTOConverter;
 import org.backwarden.api.logic.exceptions.CryptionGoneWrongException;
 import org.backwarden.api.logic.model.Credential;
-import org.backwarden.api.logic.model.Vault;
 import org.backwarden.api.logic.ports.input.CredentialUseCase;
 import org.backwarden.api.logic.ports.input.VaultUseCase;
 import org.openapitools.api.CredentialsApi;
@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.backwarden.api.adapters.controller.CacheControlHelper.notStore;
 import static org.backwarden.api.adapters.controller.LinkHelper.*;
-import static org.backwarden.api.adapters.controller.CacheControlHelper.*;
 
 @ApplicationScoped
 public class CredentialController implements CredentialsApi {
@@ -86,7 +86,7 @@ public class CredentialController implements CredentialsApi {
             if (builder != null) {
                 return Response.notModified().build();
             }
-            return Response.ok(credentialDTO).link(deleteCredential(uriInfo, vaultId, credentialId), relNameDeleteCredential).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).cacheControl(notStore()).tag(etag).build();
+            return Response.ok(credentialDTO).link(updateCredential(uriInfo, vaultId, credentialId), relNameUpdateCredential).link(deleteCredential(uriInfo, vaultId, credentialId), relNameDeleteCredential).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).cacheControl(notStore()).tag(etag).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -98,7 +98,32 @@ public class CredentialController implements CredentialsApi {
 
     @Override
     public Response vaultsVaultIdCredentialsCredentialIdPut(Integer vaultId, Integer credentialId, CredentialUpdateDTO credentialUpdateDTO) {
-        return null;
+        try {
+            long currentUserId = Long.parseLong(identity.getPrincipal().getName());
+            long userId = vaultService.getUserIdByVaultId(vaultId);
+            if (currentUserId != userId) {
+                throw new ForbiddenException("Not your account");
+            }
+            Credential credential = null;
+            try {
+                credential = credentialService.getCredential(credentialId);
+            } catch (NotFoundException e) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            EntityTag etag = new EntityTag(Integer.toString(credential.hashCode()));
+            Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
+            if (builder != null) {
+                return builder.build();
+            }
+            credentialService.updateCredential(credentialId, CredentialDTOConverter.fromDTO(credentialUpdateDTO));
+            return Response.noContent().link(getOneCredential(uriInfo, vaultId, credentialId), relNameGetOneCredential).cacheControl(notStore()).build();
+        } catch (NoSuchElementException e) {
+            log.info(e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } catch (CryptionGoneWrongException e) {
+            log.error(e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @Override
@@ -115,7 +140,7 @@ public class CredentialController implements CredentialsApi {
             List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId));
 
             for (CredentialDTO dto : credentialDTOs)
-                dto.setSelfLink(credentialLocation(uriInfo, vaultId, dto.getId()));
+                dto.setSelfLink(getOneCredential(uriInfo, vaultId, dto.getId()));
             wrapperDTO.credentialDTOS(credentialDTOs);
 
             EntityTag etag = new EntityTag(Integer.toString(wrapperDTO.hashCode()));
@@ -143,7 +168,7 @@ public class CredentialController implements CredentialsApi {
                 throw new ForbiddenException("Not your account");
             }
             long credentialid = credentialService.createCredentials(CredentialDTOConverter.fromDTO(credentialCreationDTO), vaultId);
-            return Response.created(credentialLocation(uriInfo, vaultId, credentialid)).cacheControl(notStore()).build();
+            return Response.created(getOneCredential(uriInfo, vaultId, credentialid)).cacheControl(notStore()).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();

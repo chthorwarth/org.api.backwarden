@@ -168,8 +168,8 @@ public class HateoasNavigationTest extends BaseControllerTest {
                 .statusCode(204)
                 .extract();
 
-        String singleCredentialLink = extractLink(credListResponse.headers(), "getOneVault");
-        Assertions.assertNotNull(singleCredentialLink);
+        String singleVaultLink = extractLink(credListResponse.headers(), "getOneVault");
+        Assertions.assertNotNull(singleVaultLink);
 
         // POST credential  (follow link!)
         CredentialCreationDTO cred = new CredentialCreationDTO();
@@ -199,10 +199,34 @@ public class HateoasNavigationTest extends BaseControllerTest {
                         .statusCode(200)
                         .extract();
 
+        String putCredentialLink = extractLink(credResponse.headers(), "updateCredential");
         String deleteCredentialLink = extractLink(credResponse.headers(), "deleteCredential");
         String getAllCredentialsLink2 = extractLink(credResponse.headers(), "getAllCredentials");
         Assertions.assertNotNull(getAllCredentialsLink2);
+        Assertions.assertNotNull(putCredentialLink);
 
+        CredentialUpdateDTO credentialUpdateDTO = new CredentialUpdateDTO();
+        credentialUpdateDTO.setId(1L);
+        credentialUpdateDTO.setTitle("Test");
+        credentialUpdateDTO.setUsername("user");
+        credentialUpdateDTO.setNote("test");
+        credentialUpdateDTO.setPassword("Null");
+
+        // PUT Credential
+        var putCredResponse =
+                given()
+                        .auth().oauth2(token)
+                        .contentType(ContentType.JSON)
+                        .body(credentialUpdateDTO)
+                        .when()
+                        .put(putCredentialLink)
+                        .then()
+                        .statusCode(204)
+                        .extract();
+
+
+        String getOneCredential = extractLink(putCredResponse.headers(), "getOneCredential");
+        Assertions.assertNotNull(getOneCredential);
 
         // DELETE credential
         given()

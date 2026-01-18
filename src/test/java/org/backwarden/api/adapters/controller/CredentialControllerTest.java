@@ -6,6 +6,7 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.CredentialCreationDTO;
+import org.openapitools.model.CredentialUpdateDTO;
 
 import java.util.List;
 
@@ -382,6 +383,116 @@ public class CredentialControllerTest extends BaseControllerTest {
                 .delete("/vaults/" + vaultId + "/credentials/" + credId)
                 .then()
                 .statusCode(412);
+    }
+
+
+    // ─────────────────────────
+// UPDATE (PUT)
+// ─────────────────────────
+
+    @Test
+    void putCredential_withNonMatchingEtag_returns412() {
+
+        long userId = register("put-cred1@test.de", "Strong#12345");
+        String token = token("put-cred1@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        long credentialId = createCredential(token, vaultId, getCredentialDTO());
+
+        CredentialUpdateDTO updateDTO = new CredentialUpdateDTO();
+        updateDTO.setId(credentialId);
+        updateDTO.setTitle("Should Not Update");
+        updateDTO.setUsername("nope");
+        updateDTO.setPassword("nope");
+
+        given()
+                .auth().oauth2(token)
+                .header("If-Match", "\"wrong-etag\"")
+                .contentType(ContentType.JSON)
+                .body(updateDTO)
+                .when()
+                .put("/vaults/" + vaultId + "/credentials/" + credentialId)
+                .then()
+                .statusCode(412);
+    }
+
+    @Test
+    void putCredential_withMatchingEtag_returns204_andLinkHeader() {
+
+        long userId = register("put-cred2@test.de", "Strong#12345");
+        String token = token("put-cred2@test.de", "Strong#12345");
+
+        long vaultId = createVault(token, userId);
+        long credentialId = createCredential(token, vaultId, getCredentialDTO());
+
+        // ETag vom GET holen
+        String etag =
+                given()
+                        .auth().oauth2(token)
+                        .when()
+                        .get("/vaults/" + vaultId + "/credentials/" + credentialId)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .header("ETag");
+
+        CredentialUpdateDTO updateDTO = new CredentialUpdateDTO();
+        updateDTO.setId(credentialId);
+        updateDTO.setTitle("Updated Title");
+        updateDTO.setUsername("updatedUser");
+        updateDTO.setPassword("updatedPw");
+
+        List<String> linkHeaders =
+                given()
+                        .auth().oauth2(token)
+                        .header("If-Match", etag)
+                        .contentType(ContentType.JSON)
+                        .body(updateDTO)
+                        .when()
+                        .put("/vaults/" + vaultId + "/credentials/" + credentialId)
+                        .then()
+                        .statusCode(204)
+                        // du baust: Response.noContent().link(getOneCredential(...), relNameGetOneCredential)...
+                        .extract()
+                        .headers()
+                        .getValues("Link");
+
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("rel=\"getOneCredential\"")),
+                "Link-Header muss rel=\"getOneCredential\" enthalten"
+        );
+        Assertions.assertTrue(
+                linkHeaders.stream().anyMatch(h -> h.contains("/vaults/" + vaultId + "/credentials/" + credentialId)),
+                "Link-Header muss auf das Credential-Self zeigen"
+        );
+    }
+
+    @Test
+    void putCredential_onForeignVault_returns403() {
+
+        long uid1 = register("put-cred3-a@test.de", "Strong#12345");
+        String token1 = token("put-cred3-a@test.de", "Strong#12345");
+
+        long vaultId = createVault(token1, uid1);
+        long credentialId = createCredential(token1, vaultId, getCredentialDTO());
+
+        long uid2 = register("put-cred3-b@test.de", "Strong#12345");
+        String token2 = token("put-cred3-b@test.de", "Strong#12345");
+
+        CredentialUpdateDTO updateDTO = new CredentialUpdateDTO();
+        updateDTO.setId(credentialId);
+        updateDTO.setTitle("Should Not Update");
+        updateDTO.setUsername("nope");
+        updateDTO.setPassword("nope");
+
+        given()
+                .auth().oauth2(token2)
+                .contentType(ContentType.JSON)
+                .body(updateDTO)
+                .when()
+                .put("/vaults/" + vaultId + "/credentials/" + credentialId)
+                .then()
+                .statusCode(403);
     }
 
 }

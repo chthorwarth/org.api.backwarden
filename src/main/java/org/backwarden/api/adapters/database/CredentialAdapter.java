@@ -1,11 +1,11 @@
 package org.backwarden.api.adapters.database;
 
-import jakarta.ws.rs.NotFoundException;
-import org.backwarden.api.adapters.database.model.CredentialEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
+import org.backwarden.api.adapters.database.model.CredentialEntity;
 import org.backwarden.api.adapters.database.model.VaultEntity;
 import org.backwarden.api.adapters.database.model.converter.CredentialEntityConverter;
 import org.backwarden.api.adapters.database.model.converter.UserEntityConverter;
@@ -76,22 +76,19 @@ public class CredentialAdapter implements CredentialRepository {
         entityManager.remove(credentialEntity);
     }
 
+    @Transactional
     @Override
     public void updateCredential(long id, Credential credential) {
         CredentialEntity managedCredential = entityManager.find(CredentialEntity.class, id);
         if (managedCredential == null) {
             throw new NotFoundException("Vault with id " + id + " not found");
         }
-        if (credential.getTitle() != null && !credential.getTitle().isEmpty())
-            managedCredential.setTitle(credential.getTitle());
-        if (credential.getUsername() != null && !credential.getUsername().isEmpty())
-            managedCredential.setUsername(credential.getUsername());
-        if (credential.getPasswordCiphertext() != null && !credential.getPasswordCiphertext().isEmpty())
-            managedCredential.setPasswordCiphertext(credential.getPasswordCiphertext());
-        if (credential.getPasswordIV() != null && !credential.getPasswordIV().isEmpty())
-            managedCredential.setPasswordIV(credential.getPasswordIV());
-        if (credential.getNote() != null && !credential.getNote().isEmpty())
-            managedCredential.setNote(credential.getNote());
+        managedCredential.setTitle(credential.getTitle());
+        managedCredential.setUsername(credential.getUsername());
+        managedCredential.setPasswordCiphertext(credential.getPasswordCiphertext());
+        managedCredential.setPasswordIV(credential.getPasswordIV());
+        managedCredential.setNote(credential.getNote());
+        entityManager.persist(managedCredential);
     }
 
     @Override
