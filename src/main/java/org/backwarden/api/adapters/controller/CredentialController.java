@@ -4,12 +4,8 @@ package org.backwarden.api.adapters.controller;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import org.backwarden.api.adapters.controller.model.converter.CredentialDTOConverter;
 import org.backwarden.api.logic.exceptions.CryptionGoneWrongException;
 import org.backwarden.api.logic.model.Credential;
@@ -27,9 +23,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.backwarden.api.adapters.controller.helper.AuthenticationHelper.assertUserHasAccessToResource;
 import static org.backwarden.api.adapters.controller.helper.CacheControlHelper.notStore;
 import static org.backwarden.api.adapters.controller.helper.LinkHelper.*;
-import static org.backwarden.api.adapters.controller.helper.AuthenticationHelper.*;
 
 @ApplicationScoped
 public class CredentialController implements CredentialsApi {
@@ -113,60 +109,44 @@ public class CredentialController implements CredentialsApi {
     }
 
     @Override
-    public Response listVaultCredentials(Integer vaultId, String title) {
+    public Response listVaultCredentials(Integer vaultId, String title, Integer page, Integer size) {
         try {
             long userId = vaultService.getUserIdByVaultId(vaultId);
             assertUserHasAccessToResource(identity, userId);
 
-            int page = 0;
-            int size = 10;
+            int finalPage = 0;
+            int finalSize = 10;
+            if (page != null)
+                finalPage = page;
 
-            String pageParam = uriInfo.getQueryParameters().getFirst("page");
-            String sizeParam = uriInfo.getQueryParameters().getFirst("size");
-
-            if (pageParam != null) {
-                try {
-                    page = Integer.parseInt(pageParam);
-                } catch (NumberFormatException ignored) {
-                }    // ignored? -> 400
-            }
-            if (sizeParam != null) {
-                try {
-                    size = Integer.parseInt(sizeParam);
-                } catch (NumberFormatException ignored) {
-                }
-            }
+            if (size != null)
+                finalSize = size;
 
             long totalCount = credentialService.countCredentials(vaultId, title);
 
             CredentialWrapperDTO wrapperDTO = new CredentialWrapperDTO();
 
-            List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId, title, page, size));
+            List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId, title, finalPage, finalSize));
 
             for (CredentialDTO dto : credentialDTOs)
                 dto.setSelfLink(getOneCredential(uriInfo, vaultId, dto.getId()));
             wrapperDTO.credentialDTOS(credentialDTOs);
-            wrapperDTO.setSelfLink(createPaginationUri(uriInfo, page, size, vaultId));
+            wrapperDTO.setSelfLink(createPaginationUri(uriInfo, finalPage, finalSize, vaultId));
 
-            URI selfUri = createPaginationUri(uriInfo, page, size, vaultId);
-            URI nextUri = createPaginationUri(uriInfo, page + 1, size, vaultId);
-            URI prevUri = page > 0 ? createPaginationUri(uriInfo, page - 1, size, vaultId) : null;
-
-            URI credentialsCreate = uriInfo.getBaseUriBuilder()
-                    .path("vaults/{vaultid}/credentials")
-                    .resolveTemplate("vaultid", vaultId)
-                    .build();
+            URI selfUri = createPaginationUri(uriInfo, finalPage, finalSize, vaultId);
+            URI nextUri = createPaginationUri(uriInfo, finalPage + 1, finalSize, vaultId);
+            URI prevUri = finalPage > 0 ? createPaginationUri(uriInfo, finalPage - 1, finalSize, vaultId) : null;
 
             Response.ResponseBuilder response = Response.ok(wrapperDTO);
 
             response.link(selfUri, "self");
-            if ((long) (page + 1) * size < totalCount) {
+            if ((long) (finalPage + 1) * finalSize < totalCount) {
                 response.link(nextUri, "next");
             }
             if (prevUri != null) {
                 response.link(prevUri, "prev");
             }
-            response.link(credentialsCreate, relNameCreateCredentials);
+            response.link(createCredentials(uriInfo, vaultId), relNameCreateCredentials);
             response.link(getOneVault(uriInfo, userId, vaultId), relNameGetOneVault);
 
             EntityTag etag = new EntityTag(Integer.toString(wrapperDTO.hashCode()));
