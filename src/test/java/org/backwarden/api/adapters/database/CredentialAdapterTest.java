@@ -144,13 +144,9 @@ class CredentialAdapterTest {
 
     @Test
     @Transactional
-    void getAllCredentials_shouldReturnAllCredentialsForVault()
-    {
+    void getAllCredentials_shouldReturnAllCredentials_whenPageIsBigEnough() {
         User user = userAdapter.saveUser(createTestUser("all@test.com"));
-        entityManager.flush();
-
         vaultAdapter.saveVault(user.getId(), createTestVault("Vault"));
-        entityManager.flush();
 
         long vaultId = entityManager
                 .createQuery("SELECT v.id FROM VaultEntity v", Long.class)
@@ -158,21 +154,63 @@ class CredentialAdapterTest {
 
         credentialAdapter.saveCredential(createTestCredential("One"), vaultId);
         credentialAdapter.saveCredential(createTestCredential("Two"), vaultId);
+
         entityManager.flush();
         entityManager.clear();
 
-        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId);
+        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId, 0, 10);
 
         assertEquals(2, credentials.size());
     }
 
     @Test
-    void getAllCredentials_shouldThrowNotFoundException_whenVaultDoesNotExist()
-    {
+    @Transactional
+    void getAllCredentials_shouldReturnPagedResults() {
+        User user = userAdapter.saveUser(createTestUser("pagination@test.com"));
+        vaultAdapter.saveVault(user.getId(), createTestVault("PagedVault"));
+        long vaultId = entityManager.createQuery("SELECT v.id FROM VaultEntity v WHERE v.title = 'PagedVault'", Long.class).getSingleResult();
+
+        for (int i = 1; i <= 5; i++) {
+            credentialAdapter.saveCredential(createTestCredential("Cred-" + i), vaultId);
+        }
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Credential> page0 = credentialAdapter.getAllCredentials(vaultId, 0, 2);
+        assertEquals(2, page0.size(), "Page 0 should have 2 entries");
+
+        List<Credential> page1 = credentialAdapter.getAllCredentials(vaultId, 1, 2);
+        assertEquals(2, page1.size(), "Page 1 should have 2 entries");
+
+        assertNotEquals(page0.get(0).getId(), page1.get(0).getId());
+
+        List<Credential> page2 = credentialAdapter.getAllCredentials(vaultId, 2, 2);
+        assertEquals(1, page2.size(), "Page 2 should have 1 entry");
+    }
+
+    @Test
+    void getAllCredentials_shouldThrowNotFoundException_whenVaultDoesNotExist() {
         assertThrows(
                 NotFoundException.class,
-                () -> credentialAdapter.getAllCredentials(99999L)
+                () -> credentialAdapter.getAllCredentials(99999L, 0, 10)
         );
+    }
+
+    @Test
+    @Transactional
+    void countCredentials_shouldReturnCorrectTotalAmount() {
+        User user = userAdapter.saveUser(createTestUser("count@test.com"));
+        vaultAdapter.saveVault(user.getId(), createTestVault("CountVault"));
+        long vaultId = entityManager.createQuery("SELECT v.id FROM VaultEntity v WHERE v.title = 'CountVault'", Long.class).getSingleResult();
+
+        credentialAdapter.saveCredential(createTestCredential("A"), vaultId);
+        credentialAdapter.saveCredential(createTestCredential("B"), vaultId);
+        credentialAdapter.saveCredential(createTestCredential("C"), vaultId);
+        entityManager.flush();
+
+        long count = credentialAdapter.countCredentials(vaultId);
+
+        assertEquals(3, count);
     }
 
     @Test
