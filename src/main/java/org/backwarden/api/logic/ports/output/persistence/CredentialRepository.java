@@ -12,11 +12,12 @@ public interface CredentialRepository
 
     public Credential getCredential(long id);
 
-    public List<Credential> getAllCredentials(long vaultId);
+    public List<Credential> getAllCredentials(long vaultId, String title, int page, int size);
 
     public void deleteCredential(long id);
 
     public void updateCredential(long id, Credential credential);
 
     public void deleteAll();
+    public long countCredentials(long vaultId, String title);
 }

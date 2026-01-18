@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.backwarden</groupId>
     <artifactId>api</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <dependencyManagement>
         <dependencies>
@@ -74,10 +72,8 @@
 
         <!-- REST Assured: testing REST endpoints -->
         <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-container-image-docker</artifactId>
         </dependency>
 
         <!-- ModelMapper: automatic object/DTO mapping -->
@@ -100,47 +96,53 @@
 
         <!-- Hibernate ORM with JPA support -->
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-hibernate-orm</artifactId>
-            <version>3.30.1</version>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>5.4.0</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- H2 JDBC driver integration for Quarkus -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-h2</artifactId>
+            <artifactId>quarkus-hibernate-orm</artifactId>
             <version>3.30.1</version>
         </dependency>
 
         <!-- Bean Validation (e.g. @NotNull, @Valid) -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-hibernate-validator</artifactId>
+            <artifactId>quarkus-jdbc-h2</artifactId>
             <version>3.30.1</version>
         </dependency>
 
         <!-- RESTEasy JAXB support for XML (only needed if using XML) -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-resteasy-jaxb</artifactId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
             <version>3.30.1</version>
         </dependency>
 
         <!-- RESTEasy JAXB support for JSON (only needed if using JSON) -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-resteasy-jackson</artifactId>
+            <artifactId>quarkus-resteasy-jaxb</artifactId>
             <version>3.30.1</version>
         </dependency>
 
         <!-- Quarkus CDI (dependency injection) support -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc</artifactId>
+            <artifactId>quarkus-resteasy-jackson</artifactId>
             <version>3.30.1</version>
         </dependency>
 
         <!-- JUnit 5 integration for Quarkus tests -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-arc</artifactId>
+            <version>3.30.1</version>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
@@ -190,9 +192,7 @@
                             <configHelp>false</configHelp>
                             <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
                             <generatorName>jaxrs-spec</generatorName>
-                            <additionalProperties>
-                                interfaceOnly=true,useSwaggerAnnotations=false,useTags=true,returnResponse=true
-                            </additionalProperties>
+                            <additionalProperties>interfaceOnly=true,useSwaggerAnnotations=false,useTags=true,returnResponse=true</additionalProperties>
                             <configOptions>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                                 <useJakartaEe>true</useJakartaEe>

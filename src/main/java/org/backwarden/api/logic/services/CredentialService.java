@@ -48,10 +48,11 @@ public class CredentialService implements CredentialUseCase {
     }
 
     @Override
-    public List<Credential> getAllCredentials(long vaultId) {
+    public List<Credential> getAllCredentials(long vaultId, String title, int page, int size) {
         String sessionId = jwt.getClaim("sid");
         SecretKey secretKey = sessionKeyStore.get(sessionId);
-        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId);
+        List<Credential> credentials =
+                credentialAdapter.getAllCredentials(vaultId, title, page, size);
         for (Credential credential : credentials) {
             decryptCredential(credential, secretKey);
         }
@@ -103,5 +104,10 @@ public class CredentialService implements CredentialUseCase {
         }
         credential.setPasswordCiphertext(encrypted.ciphertext());
         credential.setPasswordIV(encrypted.iv());
+    }
+
+    @Override
+    public long countCredentials(long vaultId, String title) {
+        return credentialAdapter.countCredentials(vaultId, title);
     }
 }
