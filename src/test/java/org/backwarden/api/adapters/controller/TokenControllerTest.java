@@ -3,11 +3,11 @@ package org.backwarden.api.adapters.controller;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.backwarden.api.adapters.controller.model.LoginRequest;
 import org.backwarden.api.adapters.database.UserAdapter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.LoginRequest;
 import org.openapitools.model.UserRegistrationDTO;
 
 import java.util.List;
@@ -25,8 +25,8 @@ public class TokenControllerTest extends BaseControllerTest {
         register("login@test.de", "Strong#12345");
 
         LoginRequest login = new LoginRequest();
-        login.email = "login@test.de";
-        login.password = "Strong#12345";
+        login.setEmail("login@test.de");
+        login.setPassword("Strong#12345");
 
         List<String> linkHeaders = given()
                 .contentType("application/json")
@@ -62,8 +62,8 @@ public class TokenControllerTest extends BaseControllerTest {
     void generateToken_invalidCredentials_returns401() {
 
         LoginRequest login = new LoginRequest();
-        login.email = "doesnotexist@test.de";
-        login.password = "wrongpass";
+        login.setEmail("doesnotexist@test.de");
+        login.setPassword("wrongpass");
 
         given()
                 .contentType("application/json")
@@ -78,8 +78,8 @@ public class TokenControllerTest extends BaseControllerTest {
     void generateToken_missingFields_returns400() {
 
         LoginRequest login = new LoginRequest();
-        login.email = null;
-        login.password = "abc";
+        login.setEmail(null);
+        login.setPassword("abc");
 
         given()
                 .contentType("application/json")

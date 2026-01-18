@@ -37,7 +37,7 @@ public class UserController implements UsersApi {
     Request req;
 
     @Override
-    public Response usersPost(@Valid @NotNull UserRegistrationDTO userRegistrationDTO) {
+    public Response createUser(UserRegistrationDTO userRegistrationDTO) {
         try {
             long id = userService.createUser(UserDTOConverter.fromDTO(userRegistrationDTO));
             URI location = uriInfo
@@ -57,7 +57,7 @@ public class UserController implements UsersApi {
     }
 
     @Override
-    public Response usersUserIdGet(Integer userId) {
+    public Response getUserById(Integer userId) {
         long currentUserId = Long.parseLong(identity.getPrincipal().getName());
 
         if (currentUserId != userId) {

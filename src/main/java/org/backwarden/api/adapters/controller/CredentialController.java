@@ -50,8 +50,36 @@ public class CredentialController implements CredentialsApi {
     @Context
     Request req;
 
+    private URI createPaginationUri(int page, int size, Integer vaultId) {
+        return uriInfo.getBaseUriBuilder()
+                .path("/vaults/{vaultid}/credentials")
+                .resolveTemplate("vaultid", vaultId)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .build();
+    }
+
     @Override
-    public Response vaultsVaultIdCredentialsCredentialIdDelete(Integer vaultId, Integer credentialId) {
+    public Response createVaultCredential(Integer vaultId, CredentialCreationDTO credentialCreationDTO) {
+        try {
+            long currentUserId = Long.parseLong(identity.getPrincipal().getName());
+            long userId = vaultService.getUserIdByVaultId(vaultId);
+            if (currentUserId != userId) {
+                throw new ForbiddenException("Not your account");
+            }
+            long credentialid = credentialService.createCredentials(CredentialDTOConverter.fromDTO(credentialCreationDTO), vaultId);
+            return Response.created(getOneCredential(uriInfo, vaultId, credentialid)).cacheControl(notStore()).build();
+        } catch (NoSuchElementException e) {
+            log.info(e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } catch (CryptionGoneWrongException e) {
+            log.error(e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Override
+    public Response deleteVaultCredential(Integer vaultId, Integer credentialId) {
         try {
             long currentUserId = Long.parseLong(identity.getPrincipal().getName());
             long userId = vaultService.getUserIdByVaultId(vaultId);
@@ -76,7 +104,7 @@ public class CredentialController implements CredentialsApi {
     }
 
     @Override
-    public Response vaultsVaultIdCredentialsCredentialIdGet(Integer vaultId, Integer credentialId) {
+    public Response getVaultCredentialById(Integer vaultId, Integer credentialId) {
         try {
             long currentUserId = Long.parseLong(identity.getPrincipal().getName());
             long userId = vaultService.getUserIdByVaultId(vaultId);
@@ -102,37 +130,7 @@ public class CredentialController implements CredentialsApi {
     }
 
     @Override
-    public Response vaultsVaultIdCredentialsCredentialIdPut(Integer vaultId, Integer credentialId, CredentialUpdateDTO credentialUpdateDTO) {
-        try {
-            long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-            long userId = vaultService.getUserIdByVaultId(vaultId);
-            if (currentUserId != userId) {
-                throw new ForbiddenException("Not your account");
-            }
-            Credential credential = null;
-            try {
-                credential = credentialService.getCredential(credentialId);
-            } catch (NotFoundException e) {
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-            EntityTag etag = new EntityTag(Integer.toString(credential.hashCode()));
-            Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
-            if (builder != null) {
-                return builder.build();
-            }
-            credentialService.updateCredential(credentialId, CredentialDTOConverter.fromDTO(credentialUpdateDTO));
-            return Response.noContent().link(getOneCredential(uriInfo, vaultId, credentialId), relNameGetOneCredential).cacheControl(notStore()).build();
-        } catch (NoSuchElementException e) {
-            log.info(e.getMessage());
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } catch (CryptionGoneWrongException e) {
-            log.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @Override
-    public Response vaultsVaultIdCredentialsGet(Integer vaultId, @QueryParam("title") String title) {
+    public Response listVaultCredentials(Integer vaultId, String title) {
         try {
             long currentUserId = Long.parseLong(identity.getPrincipal().getName());
             long userId = vaultService.getUserIdByVaultId(vaultId);
@@ -208,25 +206,27 @@ public class CredentialController implements CredentialsApi {
         }
     }
 
-    private URI createPaginationUri(int page, int size, Integer vaultId) {
-        return uriInfo.getBaseUriBuilder()
-                .path("/vaults/{vaultid}/credentials")
-                .resolveTemplate("vaultid", vaultId)
-                .queryParam("page", page)
-                .queryParam("size", size)
-                .build();
-    }
-
     @Override
-    public Response vaultsVaultIdCredentialsPost(Integer vaultId, CredentialCreationDTO credentialCreationDTO) {
+    public Response updateVaultCredential(Integer vaultId, Integer credentialId, CredentialUpdateDTO credentialUpdateDTO) {
         try {
             long currentUserId = Long.parseLong(identity.getPrincipal().getName());
             long userId = vaultService.getUserIdByVaultId(vaultId);
             if (currentUserId != userId) {
                 throw new ForbiddenException("Not your account");
             }
-            long credentialid = credentialService.createCredentials(CredentialDTOConverter.fromDTO(credentialCreationDTO), vaultId);
-            return Response.created(getOneCredential(uriInfo, vaultId, credentialid)).cacheControl(notStore()).build();
+            Credential credential = null;
+            try {
+                credential = credentialService.getCredential(credentialId);
+            } catch (NotFoundException e) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            EntityTag etag = new EntityTag(Integer.toString(credential.hashCode()));
+            Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
+            if (builder != null) {
+                return builder.build();
+            }
+            credentialService.updateCredential(credentialId, CredentialDTOConverter.fromDTO(credentialUpdateDTO));
+            return Response.noContent().link(getOneCredential(uriInfo, vaultId, credentialId), relNameGetOneCredential).cacheControl(notStore()).build();
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -235,5 +235,4 @@ public class CredentialController implements CredentialsApi {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 }

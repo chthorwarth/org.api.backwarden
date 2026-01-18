@@ -9,6 +9,7 @@ import org.backwarden.api.logic.ports.output.persistence.UserRepository;
 import org.backwarden.api.logic.ports.output.persistence.VaultRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.openapitools.model.CredentialCreationDTO;
+import org.openapitools.model.LoginRequest;
 import org.openapitools.model.UserRegistrationDTO;
 import org.openapitools.model.VaultCreationDTO;
 
@@ -63,9 +64,9 @@ public class BaseControllerTest {
 
     String token(String email, String password) {
 
-        var login = new org.backwarden.api.adapters.controller.model.LoginRequest();
-        login.email = email;
-        login.password = password;
+        var login = new LoginRequest();
+        login.setEmail(email);
+        login.setPassword(password);
 
         return given()
                 .contentType("application/json")

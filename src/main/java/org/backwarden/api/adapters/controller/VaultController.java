@@ -36,9 +36,36 @@ public class VaultController implements VaultsApi {
     @Context
     Request req;
 
+    @Override
+    public Response createUserVault(Integer userId, VaultCreationDTO vaultCreationDTO) {
+        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
+
+        if (currentUserId != userId) {
+            throw new ForbiddenException("Not your account");
+        }
+        long vaultid = vaultService.createVault(userId, VaultDTOConverter.fromDTO(vaultCreationDTO));
+        return Response.created(uriInfo.getBaseUriBuilder().path("/users/{userid}/vaults/{vaultid}").resolveTemplate("userid", userId).resolveTemplate("vaultid", vaultid).build()).cacheControl(notStore()).build();
+    }
 
     @Override
-    public Response usersUserIdVaultsVaultIdPut(Integer userId, Integer vaultId, VaultUpdateDTO vaultUpdateDTO) {
+    public Response deleteUserVault(Integer userId, Integer vaultId) {
+        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
+
+        if (currentUserId != userId) {
+            throw new ForbiddenException("Not your account");
+        }
+        Vault vault = vaultService.getVault(vaultId);
+        EntityTag etag = new EntityTag(Integer.toString(vault.hashCode()));
+        Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
+        if (builder != null) {
+            return builder.build();
+        }
+        vaultService.deleteVault(vaultId);
+        return Response.noContent().link(getAllVaults(uriInfo, userId), relNameGetAllVaults).cacheControl(notStore()).build();
+    }
+
+    @Override
+    public Response getUserVaultById(Integer userId, Integer vaultId) {
         long currentUserId = Long.parseLong(identity.getPrincipal().getName());
 
         if (currentUserId != userId) {
@@ -50,17 +77,19 @@ public class VaultController implements VaultsApi {
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        VaultDTO vaultDTO = VaultDTOConverter.toDTO(vault);
+        vaultDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/users/{userid}/vaults/{vaultid}").resolveTemplate("userid", userId).resolveTemplate("vaultid", vaultDTO.getId()).build());
         EntityTag etag = new EntityTag(Integer.toString(vault.hashCode()));
         Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
         if (builder != null) {
-            return builder.build();
+            return Response.notModified().build();
         }
-        vaultService.updateVault(vaultId, VaultDTOConverter.fromDTO(vaultUpdateDTO));
-        return Response.noContent().link(getOneVault(uriInfo, userId, vaultId), relNameGetOneVault).cacheControl(notStore()).build();
+
+        return Response.ok(vaultDTO).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).link(deleteVault(uriInfo, userId, vaultId), relNameDeleteVault).link(getAllVaults(uriInfo, currentUserId), relNameGetAllVaults).link(updateVault(uriInfo, currentUserId, vaultId), relNameUpdateVault).tag(etag).cacheControl(cachePrivateMustRevalidate()).build();
     }
 
     @Override
-    public Response usersUserIdVaultsGet(Integer userId) {
+    public Response listUserVaults(Integer userId) {
         long currentUserId = Long.parseLong(identity.getPrincipal().getName());
 
         if (currentUserId != userId) {
@@ -86,35 +115,7 @@ public class VaultController implements VaultsApi {
     }
 
     @Override
-    public Response usersUserIdVaultsPost(Integer userId, VaultCreationDTO vaultCreationDTO) {
-        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-
-        if (currentUserId != userId) {
-            throw new ForbiddenException("Not your account");
-        }
-        long vaultid = vaultService.createVault(userId, VaultDTOConverter.fromDTO(vaultCreationDTO));
-        return Response.created(uriInfo.getBaseUriBuilder().path("/users/{userid}/vaults/{vaultid}").resolveTemplate("userid", userId).resolveTemplate("vaultid", vaultid).build()).cacheControl(notStore()).build();
-    }
-
-    @Override
-    public Response usersUserIdVaultsVaultIdDelete(Integer userId, Integer vaultId) {
-        long currentUserId = Long.parseLong(identity.getPrincipal().getName());
-
-        if (currentUserId != userId) {
-            throw new ForbiddenException("Not your account");
-        }
-        Vault vault = vaultService.getVault(vaultId);
-        EntityTag etag = new EntityTag(Integer.toString(vault.hashCode()));
-        Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
-        if (builder != null) {
-            return builder.build();
-        }
-        vaultService.deleteVault(vaultId);
-        return Response.noContent().link(getAllVaults(uriInfo, userId), relNameGetAllVaults).cacheControl(notStore()).build();
-    }
-
-    @Override
-    public Response usersUserIdVaultsVaultIdGet(Integer userId, Integer vaultId) {
+    public Response updateUserVault(Integer userId, Integer vaultId, VaultUpdateDTO vaultUpdateDTO) {
         long currentUserId = Long.parseLong(identity.getPrincipal().getName());
 
         if (currentUserId != userId) {
@@ -126,15 +127,12 @@ public class VaultController implements VaultsApi {
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        VaultDTO vaultDTO = VaultDTOConverter.toDTO(vault);
-        vaultDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/users/{userid}/vaults/{vaultid}").resolveTemplate("userid", userId).resolveTemplate("vaultid", vaultDTO.getId()).build());
         EntityTag etag = new EntityTag(Integer.toString(vault.hashCode()));
         Response.ResponseBuilder builder = req.evaluatePreconditions(etag);
         if (builder != null) {
-            return Response.notModified().build();
+            return builder.build();
         }
-
-        return Response.ok(vaultDTO).link(getAllCredentials(uriInfo, vaultId), relNameGetAllCredentials).link(deleteVault(uriInfo, userId, vaultId), relNameDeleteVault).link(getAllVaults(uriInfo, currentUserId), relNameGetAllVaults).link(updateVault(uriInfo, currentUserId, vaultId), relNameUpdateVault).tag(etag).cacheControl(cachePrivateMustRevalidate()).build();
+        vaultService.updateVault(vaultId, VaultDTOConverter.fromDTO(vaultUpdateDTO));
+        return Response.noContent().link(getOneVault(uriInfo, userId, vaultId), relNameGetOneVault).cacheControl(notStore()).build();
     }
-
 }

@@ -1,11 +1,11 @@
 package org.backwarden.api.adapters.controller.model.converter;
 
-import org.backwarden.api.adapters.controller.model.VaultDTO;
 import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.model.Vault;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.UserDTO;
 import org.openapitools.model.UserRegistrationDTO;
+import org.openapitools.model.VaultDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +45,8 @@ class UserDTOConverterTest {
 
         List<VaultDTO> vaults = new ArrayList<>();
         VaultDTO vault = new VaultDTO();
-        vault.setId(1);
+        vault.setId(1L);
         vault.setTitle("Test Vault");
-        vault.setCredentials(new ArrayList<>());
 
         vaults.add(vault);
 

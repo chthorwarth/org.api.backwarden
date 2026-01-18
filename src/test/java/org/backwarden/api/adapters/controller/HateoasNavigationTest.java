@@ -5,7 +5,6 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.mapper.ObjectMapper;
-import org.backwarden.api.adapters.controller.model.LoginRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.*;
@@ -77,8 +76,8 @@ public class HateoasNavigationTest extends BaseControllerTest {
 
         // POST /token (Login)
         LoginRequest login = new LoginRequest();
-        login.email = "me@test.de";
-        login.password = "Strong#12345";
+        login.setEmail("me@test.de");
+        login.setPassword("Strong#12345");
 
         var tokenResponse =
                 given()

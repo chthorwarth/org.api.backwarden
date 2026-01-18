@@ -15,7 +15,7 @@ public class RootController implements RootApi {
     Request req;
 
     @Override
-    public Response apiGet() {
+    public Response getApiRoot() {
         String rep = "registerUser=" + registerUser(uriInfo) + "generateToke=" + createToken(uriInfo);
         String hash = Integer.toHexString(rep.hashCode());
         EntityTag etag = new EntityTag(hash);

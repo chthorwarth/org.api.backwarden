@@ -7,12 +7,12 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import org.backwarden.api.adapters.controller.model.LoginRequest;
 import org.backwarden.api.logic.JwtKeyGenerator;
 import org.backwarden.api.logic.exceptions.DomainValidationException;
 import org.backwarden.api.logic.exceptions.UserNotFoundException;
 import org.backwarden.api.logic.model.User;
 import org.backwarden.api.logic.ports.input.UserUseCase;
+import org.openapitools.model.LoginRequest;
 
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
@@ -37,14 +37,14 @@ public class TokenController {
     @POST
     public Response generateToken(LoginRequest request) {
 
-        if (request == null || request.email == null || request.password == null) {
+        if (request == null || request.getEmail() == null || request.getPassword() == null) {
             throw new BadRequestException("email + password required");
         }
         User user;
         String token;
         try {
-            user = userService.authenticate(request.email, request.password);
-            token = userService.generateJWTandKDF(user, request.password);
+            user = userService.authenticate(request.getEmail(), request.getPassword());
+            token = userService.generateJWTandKDF(user, request.getPassword());
         } catch (UserNotFoundException e) {
             throw new NotAuthorizedException("Invalid credentials");
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
