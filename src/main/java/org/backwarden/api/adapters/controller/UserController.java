@@ -65,6 +65,6 @@ public class UserController implements UsersApi {
         if (builder != null) {
             return builder.build();
         }
-        return Response.ok(dto).cacheControl(cachePrivateMustRevalidate()).tag(etag).build();
+        return Response.ok(dto).link(getAllVaults(uriInfo, userId), relNameGetAllVaults).cacheControl(cachePrivateMustRevalidate()).tag(etag).build();
     }
 }
