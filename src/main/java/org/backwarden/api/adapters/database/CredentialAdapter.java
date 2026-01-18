@@ -1,5 +1,6 @@
 package org.backwarden.api.adapters.database;
 
+import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.NotFoundException;
 import org.backwarden.api.adapters.database.model.CredentialEntity;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -52,19 +53,30 @@ public class CredentialAdapter implements CredentialRepository {
 
     //currently not working because of converter classes. Maybe we should add only vaultId to the DTO and model classes and save the Vault object in Entity class
     @Override
-    public List<Credential> getAllCredentials(long vaultId) {
+    public List<Credential> getAllCredentials(long vaultId, int page, int size) {
+
         VaultEntity vaultEntity = entityManager.find(VaultEntity.class, vaultId);
 
         if (vaultEntity == null) {
             throw new NotFoundException("Vault not found: " + vaultId);
         }
 
-        List<CredentialEntity> credentialEntities = entityManager.createQuery("SELECT c FROM CredentialEntity c WHERE c.vault.id = :vaultId", CredentialEntity.class)
+        TypedQuery<CredentialEntity> query = entityManager.createQuery(
+                "SELECT c FROM CredentialEntity c WHERE c.vault.id = :vaultId",
+                CredentialEntity.class);
+
+        List<CredentialEntity> credentialEntities = query
                 .setParameter("vaultId", vaultEntity.getId())
+                .setFirstResult(page * size)
+                .setMaxResults(size)
                 .getResultList();
+
         User user = UserEntityConverter.fromEntity(vaultEntity.getUser());
 
-        return CredentialEntityConverter.fromEntityList(credentialEntities, VaultEntityConverter.fromEntity(vaultEntity, user));
+        return CredentialEntityConverter.fromEntityList(
+                credentialEntities,
+                VaultEntityConverter.fromEntity(vaultEntity, user)
+        );
     }
 
     @Override
@@ -97,6 +109,14 @@ public class CredentialAdapter implements CredentialRepository {
     @Override
     public void deleteAll() {
         entityManager.createQuery("DELETE FROM CredentialEntity").executeUpdate();
+    }
+
+    @Override
+    public long countCredentials(long vaultId) {
+        return entityManager.createQuery(
+                        "SELECT COUNT(c) FROM CredentialEntity c WHERE c.vault.id = :vaultId", Long.class)
+                .setParameter("vaultId", vaultId)
+                .getSingleResult();
     }
 
 }

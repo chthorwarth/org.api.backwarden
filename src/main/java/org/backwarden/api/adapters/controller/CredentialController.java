@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.backwarden.api.adapters.controller.model.converter.CredentialDTOConverter;
 import org.backwarden.api.logic.exceptions.CryptionGoneWrongException;
+import org.backwarden.api.logic.model.Credential;
 import org.backwarden.api.logic.ports.input.CredentialUseCase;
 import org.backwarden.api.logic.ports.input.VaultUseCase;
 import org.openapitools.api.CredentialsApi;
@@ -94,25 +95,65 @@ public class CredentialController implements CredentialsApi {
         try {
             long currentUserId = Long.parseLong(identity.getPrincipal().getName());
             long userId = vaultService.getUserIdByVaultId(vaultId);
+
             if (currentUserId != userId) {
                 throw new ForbiddenException("Not your account");
             }
+
+            int page = 0;
+            int size = 10;
+
+            String pageParam = uriInfo.getQueryParameters().getFirst("page");
+            String sizeParam = uriInfo.getQueryParameters().getFirst("size");
+
+            if (pageParam != null) {
+                try { page = Integer.parseInt(pageParam); } catch (NumberFormatException ignored) {}    // ignored? -> 400
+            }
+            if (sizeParam != null) {
+                try { size = Integer.parseInt(sizeParam); } catch (NumberFormatException ignored) {}
+            }
+
+            List<Credential> credentials = credentialService.getAllCredentials(vaultId, page, size);
+
+            long totalCount = credentialService.countCredentials(vaultId);
+
+            List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentials);
+
+            for (CredentialDTO dto : credentialDTOs) {
+                dto.setSelfLink(uriInfo.getBaseUriBuilder()
+                        .path("/vaults/{vaultid}/credentials/{credentialid}")
+                        .resolveTemplate("vaultid", vaultId)
+                        .resolveTemplate("credentialid", dto.getId())
+                        .build());
+            }
+
             CredentialWrapperDTO wrapperDTO = new CredentialWrapperDTO();
-            wrapperDTO.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials").resolveTemplate("vaultid", vaultId).build());
-
-            List<CredentialDTO> credentialDTOs = CredentialDTOConverter.toDTOList(credentialService.getAllCredentials(vaultId));
-
-            for (CredentialDTO dto : credentialDTOs)
-                dto.setSelfLink(uriInfo.getBaseUriBuilder().path("/vaults/{vaultid}/credentials/{credentialid}").resolveTemplate("vaultid", vaultId).resolveTemplate("credentialid", dto.getId()).build());
-
-
             wrapperDTO.credentialDTOS(credentialDTOs);
-            URI credentialsCreate = uriInfo
-                    .getBaseUriBuilder()
+
+            wrapperDTO.setSelfLink(createPaginationUri(page, size, vaultId));
+
+            URI selfUri = createPaginationUri(page, size, vaultId);
+            URI nextUri = createPaginationUri(page + 1, size, vaultId);
+            URI prevUri = page > 0 ? createPaginationUri(page - 1, size, vaultId) : null;
+
+            URI credentialsCreate = uriInfo.getBaseUriBuilder()
                     .path("vaults/{vaultid}/credentials")
                     .resolveTemplate("vaultid", vaultId)
                     .build();
-            return Response.ok(wrapperDTO).link(credentialsCreate, "createCredential").build();
+
+            Response.ResponseBuilder response = Response.ok(wrapperDTO);
+
+            response.link(selfUri, "self");
+            if ((long) (page + 1) * size < totalCount){
+                response.link(nextUri, "next");
+            }
+            if (prevUri != null) {
+                response.link(prevUri, "prev");
+            }
+            response.link(credentialsCreate, "createCredential");
+
+            return response.build();
+
         } catch (NoSuchElementException e) {
             log.info(e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -120,6 +161,15 @@ public class CredentialController implements CredentialsApi {
             log.error(e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    private URI createPaginationUri(int page, int size, Integer vaultId) {
+        return uriInfo.getBaseUriBuilder()
+                .path("/vaults/{vaultid}/credentials")
+                .resolveTemplate("vaultid", vaultId)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .build();
     }
 
     @Override

@@ -55,8 +55,9 @@ public class CredentialService implements CredentialUseCase {
     }
 
     @Override
-    public List<Credential> getAllCredentials(long vaultId) {
-        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId);
+    public List<Credential> getAllCredentials(long vaultId, int page, int size) {
+        List<Credential> credentials = credentialAdapter.getAllCredentials(vaultId, page, size);
+
         for (Credential credential : credentials) {
             decryptCredential(credential);
         }
@@ -92,5 +93,10 @@ public class CredentialService implements CredentialUseCase {
     @Override
     public void updateCredential(long id, Credential credential) {
         credentialAdapter.updateCredential(id, credential);
+    }
+
+    @Override
+    public long countCredentials(long vaultId) {
+        return credentialAdapter.countCredentials(vaultId);
     }
 }

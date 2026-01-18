@@ -10,9 +10,10 @@ public interface CredentialUseCase {
 
     public Credential getCredential(long id);
 
-    public List<Credential> getAllCredentials(long vaultId);
+    public List<Credential> getAllCredentials(long vaultId, int page, int size);
 
     public void deleteCredential(long id);
 
     public void updateCredential(long id, Credential credential);
+    public long countCredentials(long vaultId);
 }
