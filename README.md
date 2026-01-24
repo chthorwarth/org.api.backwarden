@@ -12,3 +12,8 @@ To build the application and execute all tests, move to the project directory an
 mvn clean verify
 
 docker run -p 8085:8085 --name backwarden-api org.backwarden/api:1.0.0
+```
+
+## Note - build process fails
+
+Make sure that there are no special characters, especially spaces in your path to the project folder
