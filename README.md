@@ -1,9 +1,12 @@
 # Backwarden – Password Management API
 
 ## About the Project
-This project was developed as part of the **Backend Systems** module at the Technical University of Applied Sciences Würzburg-Schweinfurt (THWS). It is a RESTful API designed for storing and managing user credentials.
 
-The project focuses on the implementation of **Hexagonal Architecture** (Ports and Adapters) to ensure a clear separation between core business logic and external technical components like databases or web frameworks.
+This project was developed as a team effort during the Backend Systems module at the Technical University of Applied Sciences Würzburg-Schweinfurt (THWS). It’s a RESTful API for managing user credentials, inspired by password managers like Bitwarden/Backwarden.
+
+### Motivation
+We chose this project out of fascination for password managers and to explore the security and encryption concepts behind them. It also gave us hands-on experience with **Hexagonal Architecture** for decoupling and code reuse, and with **HATEOAS** to make the API self-descriptive and easy to explore. Implementing these concepts ourselves highlighted the practical benefits of modern backend design.
+
 
 ## Key Features
 * **Hexagonal Architecture:** Decouples domain logic from infrastructure (Quarkus, Hibernate).
