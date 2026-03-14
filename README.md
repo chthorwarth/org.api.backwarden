@@ -1,7 +1,7 @@
 # Backwarden – A REST-Compliant Password Manager API
 
 ## Description
-Backwarden is a REST-compliant backend API for a password manager built with **Java** and **Quarkus**, following Hexagonal Architecture. The project serves as a demonstration of REST architecture and includes concepts such as **HATEOAS**, **pagination**, **caching strategies**, and **secure API design**.
+A REST-compliant backend API for a password manager built with **Java** and **Quarkus**, following **Hexagonal Architecture**. The project demonstrates key **REST** concepts such as HATEOAS, pagination, and caching strategies, as well as key **security** concepts using secure password hashing and deterministic key derivation.
 
 ## Documentation
 Further details about the API design and usage can be found in the documentation:  
