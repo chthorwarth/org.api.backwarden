@@ -1,19 +1,18 @@
-# Backend Systems – Portfolio 03
+# Backwarden – A REST-Compliant Password Manager API
 
-## Backwarden - Password Manager
+## Description
+Backwarden is a REST-compliant backend API for a password manager built with **Java** and **Quarkus**.  
+The project serves as a demonstration of REST architecture and includes concepts such as **HATEOAS**, **pagination**, **caching strategies**, and **secure API design**.
 
-### Build & Test 
+## Documentation
+Further details about the API design and usage can be found in the documentation:  
+- [Backwarden Documentation](doc/BackwardenDocumentation.pdf)
 
-**Important:** Please ensure Docker is running before executing this command.
+## Build & Test
+During the build process, the project automatically creates a **Docker image** of the API.  
+Docker must therefore be running when executing the build.
 
-To build the application and execute all tests, move to the project directory and run the following commands.
+To build the application and run all tests, navigate to the project directory and execute:
 
 ```bash
 mvn clean verify
-
-docker run -p 8085:8085 --name backwarden-api org.backwarden/api:1.0.0
-```
-
-## Note - build process fails
-
-Make sure that there are no special characters, especially spaces in your path to the project folder
